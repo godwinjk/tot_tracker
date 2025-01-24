@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "357935669597",
+    "project_id": "tot-tracker-2772c",
+    "storage_bucket": "tot-tracker-2772c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:357935669597:android:f0b46d92425181338ac8b4",
+        "android_client_info": {
+          "package_name": "com.godwin.tot_tracker"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "357935669597-946cukf06hbvujj7ue0ohvtca81v34dq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.godwin.tot_tracker",
+            "certificate_hash": "775f4b8cf6f45b429eab4d8d28d6cd8715be8e7b"
+          }
+        },
+        {
+          "client_id": "357935669597-nc290dboegpkb2lvc04r8m1ndrkombmn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD1Fby31pRG-w6xP9UKYguXlXTD-k4jSzg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "357935669597-nc290dboegpkb2lvc04r8m1ndrkombmn.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
