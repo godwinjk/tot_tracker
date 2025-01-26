@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tot_tracker/presentantion/baby_bloc/baby_event_cubit.dart';
+import 'package:tot_tracker/presentantion/common/empty_placeholder_widget.dart';
 import 'package:tot_tracker/presentantion/model/baby_event_type.dart';
+import 'package:tot_tracker/presentantion/model/selection_type.dart';
 
 import '../../util/date_time_util.dart';
 import '../model/baby_event.dart';
@@ -22,30 +24,74 @@ class _HomePageState extends State<HomePage> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext _) {
     return BlocBuilder<BabyEventCubit, BabyEventState>(
-      builder: (context, state) {
+      builder: (_, state) {
         if (state is BabyEventLoaded) {
-          return Scaffold(
-            body: ListView.builder(
-              itemCount: state.events.length,
-              itemBuilder: (context, index) {
-                final event = state.events[index];
+          return SafeArea(
+            child: Scaffold(
+              body: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _getFilterDateChips(state),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 40),
+                    child: Container(
+                      width: double.infinity,
+                      height: 1,
+                      color: Colors.grey,
+                    ),
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  _getFilterEventChips(state),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 40),
+                    child: Container(
+                      width: double.infinity,
+                      height: 1,
+                      color: Colors.grey,
+                    ),
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  state.events.isNotEmpty
+                      ? Expanded(
+                          child: ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: state.events.length,
+                            itemBuilder: (context, index) {
+                              final event = state.events[index];
 
-                // Render different cards based on the event type
-                switch (event.type) {
-                  case BabyEventType.nursing:
-                    return _buildNursingCard(event);
-                  case BabyEventType.poop:
-                    return _buildPoopCard(event);
-                  case BabyEventType.wee:
-                    return _buildWeeCard(event);
-                }
-              },
-            ),
-            floatingActionButton: FloatingActionButton(
-              onPressed: () => _showAddEventDialog(context),
-              child: const Icon(Icons.add),
+                              // Render different cards based on the event type
+                              switch (event.type) {
+                                case BabyEventType.nursing:
+                                  return _buildNursingCard(event);
+                                case BabyEventType.poop:
+                                  return _buildPoopCard(event);
+                                case BabyEventType.wee:
+                                  return _buildWeeCard(event);
+                                case BabyEventType.all:
+                                  return const SizedBox.shrink();
+                              }
+                            },
+                          ),
+                        )
+                      : Expanded(child: const EmptyPlaceholderWidget()),
+                ],
+              ),
+              floatingActionButton: FloatingActionButton(
+                onPressed: () => _showAddEventDialog(context),
+                child: const Icon(Icons.add),
+              ),
             ),
           );
         } else {
@@ -194,7 +240,107 @@ class _HomePageState extends State<HomePage> {
         ),
       );
     }
-    return SizedBox();
+    return SizedBox.shrink();
+  }
+
+  Widget _getFilterDateChips(BabyEventLoaded state) {
+    return Wrap(
+      runSpacing: 20,
+      alignment: WrapAlignment.center,
+      spacing: 10,
+      children: [
+        ChoiceChip(
+            onSelected: (isSelected) {
+              if (isSelected) {
+                context.read<BabyEventCubit>().filter(type: FilterType.all);
+              }
+            },
+            label: const Text('All'),
+            selected: state.filterType == FilterType.all),
+        ChoiceChip(
+            onSelected: (isSelected) {
+              if (isSelected) {
+                context.read<BabyEventCubit>().filter(type: FilterType.day);
+              }
+            },
+            label: const Text('Day'),
+            selected: state.filterType == FilterType.day),
+        ChoiceChip(
+            onSelected: (isSelected) {
+              if (isSelected) {
+                context.read<BabyEventCubit>().filter(type: FilterType.week);
+              }
+            },
+            label: const Text('Week'),
+            selected: state.filterType == FilterType.week),
+        ChoiceChip(
+            onSelected: (isSelected) {
+              if (isSelected) {
+                context.read<BabyEventCubit>().filter(type: FilterType.month);
+              }
+            },
+            label: const Text('Month'),
+            selected: state.filterType == FilterType.month),
+        ChoiceChip(
+            onSelected: (isSelected) {
+              if (isSelected) {
+                context.read<BabyEventCubit>().filter(type: FilterType.year);
+              }
+            },
+            label: const Text('Year'),
+            selected: state.filterType == FilterType.year),
+      ],
+    );
+  }
+
+  Widget _getFilterEventChips(BabyEventLoaded state) {
+    return Wrap(
+      runSpacing: 20,
+      alignment: WrapAlignment.center,
+      spacing: 10,
+      children: [
+        ChoiceChip(
+            onSelected: (isSelected) {
+              if (isSelected) {
+                context
+                    .read<BabyEventCubit>()
+                    .filter(eventType: BabyEventType.all);
+              }
+            },
+            label: const Text('All'),
+            selected: state.eventType == BabyEventType.all),
+        ChoiceChip(
+            onSelected: (isSelected) {
+              if (isSelected) {
+                context
+                    .read<BabyEventCubit>()
+                    .filter(eventType: BabyEventType.nursing);
+              }
+            },
+            label: const Text('Feed'),
+            selected: state.eventType == BabyEventType.nursing),
+        ChoiceChip(
+            onSelected: (isSelected) {
+              if (isSelected) {
+                context
+                    .read<BabyEventCubit>()
+                    .filter(eventType: BabyEventType.poop);
+              }
+            },
+            label: const Text('Poop'),
+            selected: state.eventType == BabyEventType.poop),
+        ChoiceChip(
+            onSelected: (isSelected) {
+              if (isSelected) {
+                context
+                    .read<BabyEventCubit>()
+                    .filter(eventType: BabyEventType.wee);
+              }
+            },
+            label: const Text('Wee'),
+            selected: state.eventType == BabyEventType.wee),
+      ],
+    );
   }
 
   Color _getCardColor(BabyEventType type) {
@@ -205,6 +351,8 @@ class _HomePageState extends State<HomePage> {
         return Colors.lightGreen.shade100;
       case BabyEventType.poop:
         return Colors.orange.shade100;
+      case BabyEventType.all:
+        return Colors.white;
     }
   }
 

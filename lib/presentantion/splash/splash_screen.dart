@@ -50,8 +50,8 @@ class _SplashScreenState extends State<SplashScreen> {
     Future.delayed(const Duration(seconds: 2), () {
       SharedPreferences.getInstance().then((pref) {
         final gender = pref.getString(SharedPrefConstants.gender) ?? '';
-        if (gender.isEmpty || gender == 'any') {
-          GetIt.instance<GoRouter>().replace(RoutePath.gender);
+        if (gender.isEmpty) {
+          GetIt.instance<GoRouter>().replace(RoutePath.due);
         } else {
           GetIt.instance<GoRouter>().replace(RoutePath.home);
         }

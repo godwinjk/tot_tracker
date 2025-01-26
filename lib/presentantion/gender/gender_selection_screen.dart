@@ -1,11 +1,7 @@
 import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
-import 'package:lottie/lottie.dart';
-import 'dart:math' as math;
-
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tot_tracker/persistence/shared_pref_const.dart';
 import 'package:tot_tracker/res/asset_const.dart';

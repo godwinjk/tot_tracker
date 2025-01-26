@@ -1,1 +1,1 @@
-enum BabyEventType { nursing, wee, poop }
+enum BabyEventType { nursing, wee, poop, all }

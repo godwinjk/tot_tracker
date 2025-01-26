@@ -16,10 +16,11 @@ final class BabyEventProgress extends BabyEventState {
 
 final class BabyEventLoaded extends BabyEventState {
   final List<BabyEvent> events;
+  final FilterType filterType;
+  final BabyEventType eventType;
 
-  const BabyEventLoaded(this.events);
+  const BabyEventLoaded(this.events, this.filterType, this.eventType);
 
   @override
   List<Object> get props => [events];
 }
-

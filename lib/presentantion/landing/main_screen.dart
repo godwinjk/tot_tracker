@@ -12,14 +12,16 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  final _tabs = [RoutePath.summary, RoutePath.home, RoutePath.summary];
-  int _currentIndex = 0;
+  final _tabs = [RoutePath.summary, RoutePath.home,RoutePath.schedule,  RoutePath.summary];
+  int _currentIndex = 1;
 
   void _onTabTapped(int index) {
+    if (_currentIndex != index) {
+      context.go(_tabs[index]); // Navigate to the selected tab route
+    }
     setState(() {
       _currentIndex = index;
     });
-    context.go(_tabs[index]); // Navigate to the selected tab route
   }
 
   @override
@@ -32,7 +34,10 @@ class _MainScreenState extends State<MainScreen> {
         items: const [
           BottomNavigationBarItem(
               icon: Icon(Icons.assessment), label: 'Summary'),
-          BottomNavigationBarItem(icon: Icon(Icons.child_care), label: 'Home'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.child_care_rounded), label: 'Home'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.notifications_active), label: 'Schedule'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
         ],
       ),
