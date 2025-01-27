@@ -46,10 +46,19 @@ class SummaryCubit extends Cubit<SummaryState> {
         .where((element) => element.type == BabyEventType.nursing)
         .toList();
 
-    final poopDayBasis = filterBasedOnDay(poopData);
-    final weeDayBasis = filterBasedOnDay(weeData);
-    final feedDayBasis = filterBasedOnDay(feedData);
+    Map<int, int> poopDayBasis = {};
+    Map<int, int> weeDayBasis = {};
+    Map<int, int> feedDayBasis = {};
 
+    if (filterType == FilterType.last24 || filterType == FilterType.day) {
+      poopDayBasis = {1: poopData.length};
+      weeDayBasis = {1: weeData.length};
+      feedDayBasis = {1: feedData.length};
+    } else {
+      poopDayBasis = filterBasedOnDay(poopData);
+      weeDayBasis = filterBasedOnDay(weeData);
+      feedDayBasis = filterBasedOnDay(feedData);
+    }
     final dob = await _getDob();
     final months = calculateAgeInMonths(dob);
 
@@ -72,15 +81,16 @@ class SummaryCubit extends Cubit<SummaryState> {
     }
     emit(SummaryLoaded(
         SummaryChartData(
-            poopData: poopDayBasis,
-            feedData: feedDayBasis,
-            weeData: weeDayBasis,
-            feedLowerData: feedLower,
-            feedUpperData: feedUpper,
-            poopLowerData: poopLower,
-            poopUpperData: poopUpper,
-            weeLowerData: weeLower,
-            weeUpperData: weeUpper),
+          poopData: poopDayBasis,
+          feedData: feedDayBasis,
+          weeData: weeDayBasis,
+          feedLowerData: feedLower,
+          feedUpperData: feedUpper,
+          poopLowerData: poopLower,
+          poopUpperData: poopUpper,
+          weeLowerData: weeLower,
+          weeUpperData: weeUpper,
+        ),
         filterType,
         filterEventType));
   }
@@ -128,6 +138,30 @@ class SummaryCubit extends Cubit<SummaryState> {
     return dayWiseCounts;
   }
 
+  Map<int, int> filterBasedOnHour(List<BabyEvent> events) {
+    // Step 1: Initialize an empty map for grouping by day
+    // Step 1: Initialize an empty map for day-wise counts
+    Map<int, int> dayWiseCounts = {};
+
+    // Step 2: Iterate over the list of events
+    for (var event in events) {
+      // Convert epochTime to a DateTime object
+      DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(event.eventTime);
+
+      // Extract the day (1-31) from the DateTime object
+      int hour = dateTime.hour;
+
+      // Increment the count for this day in the map
+      if (dayWiseCounts.containsKey(hour)) {
+        dayWiseCounts[hour] = dayWiseCounts[hour]! + 1;
+      } else {
+        dayWiseCounts[hour] = 1;
+      }
+    }
+
+    return dayWiseCounts;
+  }
+
   Future<DateTime> _getDob() async {
     final pref = await SharedPreferences.getInstance();
     int epoch = pref.getInt(SharedPrefConstants.dueDate) ?? 0;
@@ -162,7 +196,10 @@ class SummaryCubit extends Cubit<SummaryState> {
   void _filterBasedOnType(List<BabyEvent> events, FilterType type) {
     filterType = type;
 
-    if (type == FilterType.day) {
+    if (type == FilterType.last24) {
+      final now = DateTime.now();
+      filterEvents = BabyEventUtils.filterByLast24(events, now);
+    } else if (type == FilterType.day) {
       final now = DateTime.now();
       filterEvents =
           BabyEventUtils.filterByDay(events, now.year, now.month, now.day);

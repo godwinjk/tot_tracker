@@ -110,7 +110,7 @@ class _MyAppState extends State<MyApp> {
         builder: (context, theme) {
           return MaterialApp.router(
             routerConfig: router,
-            title: 'Tot Tracker',
+            title: 'Baby Tracker',
             theme: theme,
           );
         },

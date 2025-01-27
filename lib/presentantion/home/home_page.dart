@@ -246,7 +246,7 @@ class _HomePageState extends State<HomePage> {
   Widget _getFilterDateChips(BabyEventLoaded state) {
     return Wrap(
       runSpacing: 20,
-      alignment: WrapAlignment.center,
+      alignment: WrapAlignment.start,
       spacing: 10,
       children: [
         ChoiceChip(
@@ -257,6 +257,14 @@ class _HomePageState extends State<HomePage> {
             },
             label: const Text('All'),
             selected: state.filterType == FilterType.all),
+        ChoiceChip(
+            onSelected: (isSelected) {
+              if (isSelected) {
+                context.read<BabyEventCubit>().filter(type: FilterType.last24);
+              }
+            },
+            label: const Text('Last 24'),
+            selected: state.filterType == FilterType.last24),
         ChoiceChip(
             onSelected: (isSelected) {
               if (isSelected) {
@@ -296,7 +304,7 @@ class _HomePageState extends State<HomePage> {
   Widget _getFilterEventChips(BabyEventLoaded state) {
     return Wrap(
       runSpacing: 20,
-      alignment: WrapAlignment.center,
+      alignment: WrapAlignment.start,
       spacing: 10,
       children: [
         ChoiceChip(

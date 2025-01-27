@@ -220,8 +220,10 @@ class _GenderSelectionScreenState extends State<GenderSelectionScreen> {
       } else if (_selectedGender == "girl") {
         GetIt.instance<ThemeCubit>().updateTheme(GirlColorPalette());
       }
-
-      GetIt.instance<GoRouter>().replace(RoutePath.home);
+      SharedPreferences.getInstance().then((pref) {
+        pref.setInt(SharedPrefConstants.setupSteps, 2);
+      });
+      GetIt.instance<GoRouter>().go(RoutePath.babyName);
     });
   }
 }

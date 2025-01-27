@@ -61,8 +61,10 @@ class BabyEventCubit extends Cubit<BabyEventState> {
 
   void _filterBasedOnType(List<BabyEvent> events, FilterType type) {
     filterType = type;
-
-    if (type == FilterType.day) {
+    if (type == FilterType.last24) {
+      final now = DateTime.now();
+      filterEvents = BabyEventUtils.filterByLast24(events, now);
+    } else if (type == FilterType.day) {
       final now = DateTime.now();
       filterEvents =
           BabyEventUtils.filterByDay(events, now.year, now.month, now.day);

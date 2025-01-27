@@ -48,6 +48,13 @@ class BabyEventUtils {
     return weekNumber;
   }
 
+  static List<BabyEvent> filterByLast24(List<BabyEvent> events, DateTime now) {
+    return events.where((event) {
+      final last24 = now.subtract(const Duration(hours: 24)).millisecondsSinceEpoch;
+      return event.eventTime > last24;
+    }).toList();
+  }
+
   // Filter events by day
   static List<BabyEvent> filterByDay(
       List<BabyEvent> events, int year, int month, int day) {

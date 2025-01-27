@@ -61,39 +61,11 @@ class _SummaryPageState extends State<SummaryPage> {
                       color: Colors.grey,
                     ),
                   ),
-                  if (state.eventType == BabyEventType.all ||
-                      state.eventType == BabyEventType.nursing)
-                    const SizedBox(height: 20),
-                  if (state.eventType == BabyEventType.all ||
-                      state.eventType == BabyEventType.nursing)
-                    _buildChartSection(
-                      title: "Feed Times",
-                      data: state.summary.feedData,
-                      upper: state.summary.feedUpperData,
-                      lower: state.summary.feedLowerData,
-                    ),
-                  if (state.eventType == BabyEventType.all ||
-                      state.eventType == BabyEventType.poop)
-                    const SizedBox(height: 20),
-                  if (state.eventType == BabyEventType.all ||
-                      state.eventType == BabyEventType.poop)
-                    _buildChartSection(
-                      title: "Poop times",
-                      data: state.summary.poopData,
-                      upper: state.summary.poopUpperData,
-                      lower: state.summary.poopLowerData,
-                    ),
-                  if (state.eventType == BabyEventType.all ||
-                      state.eventType == BabyEventType.wee)
-                    const SizedBox(height: 20),
-                  if (state.eventType == BabyEventType.all ||
-                      state.eventType == BabyEventType.wee)
-                    _buildChartSection(
-                      title: "Wee times",
-                      data: state.summary.weeData,
-                      upper: state.summary.weeUpperData,
-                      lower: state.summary.weeLowerData,
-                    ),
+                  if (state.filterType == FilterType.day ||
+                      state.filterType == FilterType.last24)
+                    _buildDayConsolidateChart(state)
+                  else
+                    _buildDailyChart(state),
                   const Padding(
                     padding: EdgeInsets.all(16.0),
                     child: Column(
@@ -148,12 +120,147 @@ class _SummaryPageState extends State<SummaryPage> {
     );
   }
 
+  Widget _buildDayConsolidateChart(SummaryLoaded state) {
+    final Map<String, Map<String, int>> data = {
+      "poop": {
+        "current": state.summary.poopData[1] ?? 0,
+        "upper": state.summary.poopUpperData[1] ?? 0,
+        "lower": state.summary.poopLowerData[1] ?? 0,
+      },
+      "wee": {
+        "current": state.summary.weeData[1] ?? 0,
+        "upper": state.summary.weeUpperData[1] ?? 0,
+        "lower": state.summary.weeLowerData[1] ?? 0,
+      },
+      "feed": {
+        "current": state.summary.feedData[1] ?? 0,
+        "upper": state.summary.feedUpperData[1] ?? 0,
+        "lower": state.summary.feedLowerData[1] ?? 0,
+      },
+    };
+
+    final maxY = [
+      state.summary.poopData[1] ?? 0,
+      state.summary.poopUpperData[1] ?? 0,
+      state.summary.weeData[1] ?? 0,
+      state.summary.weeUpperData[1] ?? 0,
+      state.summary.feedData[1] ?? 0,
+      state.summary.feedUpperData[1] ?? 0,
+    ].reduce(max);
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              _buildLegendItem(Colors.blue, "Current"),
+              SizedBox(width: 8),
+              _buildLegendItem(Colors.green.shade200, "Upper"),
+              SizedBox(width: 8),
+              _buildLegendItem(Colors.red.shade200, "Lower"),
+            ],
+          ),
+          SizedBox(
+            height: 300,
+            child: BarChart(
+              BarChartData(
+                barGroups: _generateBarGroups(data),
+                titlesData: FlTitlesData(
+                  leftTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      interval: 2, // Adjust the Y-axis interval
+                      getTitlesWidget: (value, meta) {
+                        return Text(
+                          value.toInt().toString(),
+                          style: const TextStyle(fontSize: 12),
+                        );
+                      },
+                    ),
+                  ),
+                  bottomTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      getTitlesWidget: (value, meta) {
+                        return Padding(
+                          padding: const EdgeInsets.only(top: 8.0),
+                          child: Text(
+                            _getCategoryLabel(value.toInt()),
+                            style: TextStyle(
+                                fontSize: 12, fontWeight: FontWeight.bold),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+                gridData: FlGridData(show: true),
+                borderData: FlBorderData(show: false),
+                barTouchData: BarTouchData(enabled: true),
+                maxY: maxY
+                    .toDouble(), // Adjust based on the max value in your data
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDailyChart(SummaryLoaded state) {
+    return Column(
+      children: [
+        if (state.eventType == BabyEventType.all ||
+            state.eventType == BabyEventType.nursing)
+          const SizedBox(height: 20),
+        if (state.eventType == BabyEventType.all ||
+            state.eventType == BabyEventType.nursing)
+          _buildChartSection(
+            title: "Feed Times",
+            data: state.summary.feedData,
+            upper: state.summary.feedUpperData,
+            lower: state.summary.feedLowerData,
+          ),
+        if (state.eventType == BabyEventType.all ||
+            state.eventType == BabyEventType.poop)
+          const SizedBox(height: 20),
+        if (state.eventType == BabyEventType.all ||
+            state.eventType == BabyEventType.poop)
+          _buildChartSection(
+            title: "Poop times",
+            data: state.summary.poopData,
+            upper: state.summary.poopUpperData,
+            lower: state.summary.poopLowerData,
+          ),
+        if (state.eventType == BabyEventType.all ||
+            state.eventType == BabyEventType.wee)
+          const SizedBox(height: 20),
+        if (state.eventType == BabyEventType.all ||
+            state.eventType == BabyEventType.wee)
+          _buildChartSection(
+            title: "Wee times",
+            data: state.summary.weeData,
+            upper: state.summary.weeUpperData,
+            lower: state.summary.weeLowerData,
+          ),
+      ],
+    );
+  }
+
   // Chart Section with Title and Chart
   Widget _buildChartSection(
       {required String title,
       required Map<int, int> data,
       required Map<int, int> upper,
       required Map<int, int> lower}) {
+    final keyList = data.keys.toList();
+    keyList.sort();
+
+    final minX = keyList.first;
+    final maxX = keyList.last;
     final upperLine = _generateUpperLine(
       upper,
     );
@@ -206,8 +313,8 @@ class _SummaryPageState extends State<SummaryPage> {
                     ),
                   ),
                 ),
-                minX: 1,
-                maxX: 31,
+                minX: minX.toDouble(),
+                maxX: maxX.toDouble(),
                 // Days in a month (1–31)
                 minY: 0,
                 maxY: _getMaxY(data, upper),
@@ -264,102 +371,184 @@ class _SummaryPageState extends State<SummaryPage> {
   }
 
   Widget _getFilterDateChips(SummaryLoaded state) {
-    return Wrap(
-      runSpacing: 20,
-      alignment: WrapAlignment.center,
-      spacing: 10,
-      children: [
-        ChoiceChip(
-            onSelected: (isSelected) {
-              if (isSelected) {
-                context.read<SummaryCubit>().filter(type: FilterType.all);
-              }
-            },
-            label: const Text('All'),
-            selected: state.filterType == FilterType.all),
-        ChoiceChip(
-            onSelected: (isSelected) {
-              if (isSelected) {
-                context.read<SummaryCubit>().filter(type: FilterType.day);
-              }
-            },
-            label: const Text('Day'),
-            selected: state.filterType == FilterType.day),
-        ChoiceChip(
-            onSelected: (isSelected) {
-              if (isSelected) {
-                context.read<SummaryCubit>().filter(type: FilterType.week);
-              }
-            },
-            label: const Text('Week'),
-            selected: state.filterType == FilterType.week),
-        ChoiceChip(
-            onSelected: (isSelected) {
-              if (isSelected) {
-                context.read<SummaryCubit>().filter(type: FilterType.month);
-              }
-            },
-            label: const Text('Month'),
-            selected: state.filterType == FilterType.month),
-        ChoiceChip(
-            onSelected: (isSelected) {
-              if (isSelected) {
-                context.read<SummaryCubit>().filter(type: FilterType.year);
-              }
-            },
-            label: const Text('Year'),
-            selected: state.filterType == FilterType.year),
-      ],
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+      child: Wrap(
+        runSpacing: 20,
+        alignment: WrapAlignment.start,
+        spacing: 10,
+        children: [
+          ChoiceChip(
+              onSelected: (isSelected) {
+                if (isSelected) {
+                  context.read<SummaryCubit>().filter(type: FilterType.all);
+                }
+              },
+              label: const Text('All'),
+              selected: state.filterType == FilterType.all),
+          ChoiceChip(
+              onSelected: (isSelected) {
+                if (isSelected) {
+                  context.read<SummaryCubit>().filter(type: FilterType.last24);
+                }
+              },
+              label: const Text('Last 24'),
+              selected: state.filterType == FilterType.last24),
+          ChoiceChip(
+              onSelected: (isSelected) {
+                if (isSelected) {
+                  context.read<SummaryCubit>().filter(type: FilterType.day);
+                }
+              },
+              label: const Text('Day'),
+              selected: state.filterType == FilterType.day),
+          ChoiceChip(
+              onSelected: (isSelected) {
+                if (isSelected) {
+                  context.read<SummaryCubit>().filter(type: FilterType.week);
+                }
+              },
+              label: const Text('Week'),
+              selected: state.filterType == FilterType.week),
+          ChoiceChip(
+              onSelected: (isSelected) {
+                if (isSelected) {
+                  context.read<SummaryCubit>().filter(type: FilterType.month);
+                }
+              },
+              label: const Text('Month'),
+              selected: state.filterType == FilterType.month),
+          ChoiceChip(
+              onSelected: (isSelected) {
+                if (isSelected) {
+                  context.read<SummaryCubit>().filter(type: FilterType.year);
+                }
+              },
+              label: const Text('Year'),
+              selected: state.filterType == FilterType.year),
+        ],
+      ),
     );
   }
 
   Widget _getFilterEventChips(SummaryLoaded state) {
-    return Wrap(
-      runSpacing: 20,
-      alignment: WrapAlignment.center,
-      spacing: 10,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+      child: Wrap(
+        runSpacing: 20,
+        alignment: WrapAlignment.start,
+        spacing: 10,
+        children: [
+          ChoiceChip(
+              onSelected: (isSelected) {
+                if (isSelected) {
+                  context
+                      .read<SummaryCubit>()
+                      .filter(eventType: BabyEventType.all);
+                }
+              },
+              label: const Text('All'),
+              selected: state.eventType == BabyEventType.all),
+          ChoiceChip(
+              onSelected: (isSelected) {
+                if (isSelected) {
+                  context
+                      .read<SummaryCubit>()
+                      .filter(eventType: BabyEventType.nursing);
+                }
+              },
+              label: const Text('Feed'),
+              selected: state.eventType == BabyEventType.nursing),
+          ChoiceChip(
+              onSelected: (isSelected) {
+                if (isSelected) {
+                  context
+                      .read<SummaryCubit>()
+                      .filter(eventType: BabyEventType.poop);
+                }
+              },
+              label: const Text('Poop'),
+              selected: state.eventType == BabyEventType.poop),
+          ChoiceChip(
+              onSelected: (isSelected) {
+                if (isSelected) {
+                  context
+                      .read<SummaryCubit>()
+                      .filter(eventType: BabyEventType.wee);
+                }
+              },
+              label: const Text('Wee'),
+              selected: state.eventType == BabyEventType.wee),
+        ],
+      ),
+    );
+  }
+
+  // Generate pie chart sections
+  List<BarChartGroupData> _generateBarGroups(
+      Map<String, Map<String, int>> data) {
+    int index = 0;
+    return data.entries.map((entry) {
+      final current = entry.value['current']!.toDouble();
+      final upper = entry.value['upper']!.toDouble();
+      final lower = entry.value['lower']!.toDouble();
+
+      return BarChartGroupData(
+        x: index++,
+        barRods: [
+          BarChartRodData(
+            toY: upper,
+            color: Colors.green.shade200,
+            width: 10,
+          ),
+          BarChartRodData(
+            toY: current,
+            color: Colors.blue,
+            width: 10,
+          ),
+          BarChartRodData(
+            toY: lower,
+            color: Colors.red.shade200,
+            width: 10,
+          ),
+        ],
+        barsSpace: 5, // Space between the bars within a group
+      );
+    }).toList();
+  }
+
+  // Build a legend item
+  Widget _buildLegendItem(Color color, String label) {
+    return Row(
       children: [
-        ChoiceChip(
-            onSelected: (isSelected) {
-              if (isSelected) {
-                context
-                    .read<SummaryCubit>()
-                    .filter(eventType: BabyEventType.all);
-              }
-            },
-            label: const Text('All'),
-            selected: state.eventType == BabyEventType.all),
-        ChoiceChip(
-            onSelected: (isSelected) {
-              if (isSelected) {
-                context
-                    .read<SummaryCubit>()
-                    .filter(eventType: BabyEventType.nursing);
-              }
-            },
-            label: const Text('Feed'),
-            selected: state.eventType == BabyEventType.nursing),
-        ChoiceChip(
-            onSelected: (isSelected) {
-              if (isSelected) {
-                context
-                    .read<SummaryCubit>()
-                    .filter(eventType: BabyEventType.poop);
-              }
-            },
-            label: const Text('Poop'),
-            selected: state.eventType == BabyEventType.poop),
-        ChoiceChip(
-            onSelected: (isSelected) {
-              if (isSelected) {
-                context
-                    .read<SummaryCubit>()
-                    .filter(eventType: BabyEventType.wee);
-              }
-            },
-            label: const Text('Wee'),
-            selected: state.eventType == BabyEventType.wee),
+        Container(
+          width: 16,
+          height: 16,
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.circular(4),
+          ),
+        ),
+        SizedBox(width: 8),
+        Text(
+          label,
+          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+        ),
       ],
     );
+  }
+
+  // Get category label for the X-axis
+  String _getCategoryLabel(int index) {
+    switch (index) {
+      case 0:
+        return "Poop";
+      case 1:
+        return "Wee";
+      case 2:
+        return "Feed";
+      default:
+        return "";
+    }
   }
 }

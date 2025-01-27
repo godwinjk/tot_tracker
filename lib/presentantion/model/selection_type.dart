@@ -1,4 +1,4 @@
-enum FilterType { day, week, month, year, all }
+enum FilterType { last24, day, week, month, year, all }
 
 // Extension to add helper methods for converting to/from string
 extension FilterTypeExtension on FilterType {

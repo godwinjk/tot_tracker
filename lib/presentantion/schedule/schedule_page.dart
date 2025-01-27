@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -165,26 +167,21 @@ class _SchedulePageState extends State<SchedulePage> {
   void _requestPermission() async {
     FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
         FlutterLocalNotificationsPlugin();
-    flutterLocalNotificationsPlugin
-        .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
-        ?.requestNotificationsPermission();
 
-    final IOSFlutterLocalNotificationsPlugin? iosPlatform =
-        flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<
-            IOSFlutterLocalNotificationsPlugin>();
-
-    // Check current permission status
-    final bool? isGranted = await iosPlatform?.requestPermissions(
-      alert: true,
-      badge: true,
-      sound: true,
-    );
-
-    if (isGranted != null && isGranted) {
-      print("Notification permissions granted");
+    if (Platform.isAndroid) {
+      AndroidFlutterLocalNotificationsPlugin? androidPlatform =
+          flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin>();
+      await androidPlatform?.requestNotificationsPermission();
     } else {
-      print("Notification permissions not granted");
+      final IOSFlutterLocalNotificationsPlugin? iosPlatform =
+          flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<
+              IOSFlutterLocalNotificationsPlugin>();
+      final bool? isGranted = await iosPlatform?.requestPermissions(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
     }
   }
 }

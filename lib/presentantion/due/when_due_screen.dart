@@ -69,8 +69,9 @@ class _WhenAreDueScreenState extends State<WhenAreDueScreen> {
     if (picked != null) {
       SharedPreferences.getInstance().then((pref) {
         pref.setInt(SharedPrefConstants.dueDate, picked.millisecondsSinceEpoch);
+        pref.setInt(SharedPrefConstants.setupSteps, 1);
 
-        getIt<GoRouter>().replace(RoutePath.gender);
+        getIt<GoRouter>().go(RoutePath.gender);
       });
     }
   }

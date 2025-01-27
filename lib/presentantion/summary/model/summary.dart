@@ -9,14 +9,15 @@ class SummaryChartData {
   final Map<int, int> feedLowerData;
   final Map<int, int> feedData;
 
-  SummaryChartData(
-      {required this.poopUpperData,
-      required this.poopLowerData,
-      required this.weeUpperData,
-      required this.weeLowerData,
-      required this.feedUpperData,
-      required this.feedLowerData,
-      required this.poopData,
-      required this.weeData,
-      required this.feedData});
+  SummaryChartData({
+    required this.poopUpperData,
+    required this.poopLowerData,
+    required this.weeUpperData,
+    required this.weeLowerData,
+    required this.feedUpperData,
+    required this.feedLowerData,
+    required this.poopData,
+    required this.weeData,
+    required this.feedData,
+  });
 }

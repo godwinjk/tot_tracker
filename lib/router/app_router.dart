@@ -1,4 +1,5 @@
 import 'package:go_router/go_router.dart';
+import 'package:tot_tracker/presentantion/baby_name/baby_name_screen.dart';
 import 'package:tot_tracker/presentantion/due/when_due_screen.dart';
 import 'package:tot_tracker/presentantion/gender/gender_selection_screen.dart';
 import 'package:tot_tracker/presentantion/home/home_page.dart';
@@ -24,6 +25,10 @@ final router = GoRouter(
     GoRoute(
       path: RoutePath.due,
       builder: (context, state) => const WhenAreDueScreen(),
+    ),
+    GoRoute(
+      path: RoutePath.babyName,
+      builder: (context, state) => const BabyNameScreen(),
     ),
     GoRoute(
       path: RoutePath.login,

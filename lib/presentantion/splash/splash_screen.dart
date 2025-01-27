@@ -34,11 +34,13 @@ class _SplashScreenState extends State<SplashScreen> {
                 width: math.min(MediaQuery.sizeOf(context).height * 0.8,
                     MediaQuery.sizeOf(context).width * 0.8)),
             AnimatedTextKit(animatedTexts: [
-              TyperAnimatedText('Tot\nTracker',
-                  speed: Duration(milliseconds: 100),
+              TyperAnimatedText('Tot Tracker',
+                  speed: const Duration(milliseconds: 100),
                   textAlign: TextAlign.center,
-                  textStyle:
-                      TextStyle(fontSize: 35, fontWeight: FontWeight.bold))
+                  textStyle: const TextStyle(
+                    fontSize: 30,
+                    fontWeight: FontWeight.bold,
+                  ))
             ])
           ],
         ),
@@ -49,13 +51,29 @@ class _SplashScreenState extends State<SplashScreen> {
   void navigateToNext() {
     Future.delayed(const Duration(seconds: 2), () {
       SharedPreferences.getInstance().then((pref) {
-        final gender = pref.getString(SharedPrefConstants.gender) ?? '';
-        if (gender.isEmpty) {
-          GetIt.instance<GoRouter>().replace(RoutePath.due);
+        final settingsCompleted =
+            pref.getBool(SharedPrefConstants.settingsCompleted) ?? false;
+        if (!settingsCompleted) {
+          int steps = pref.getInt(SharedPrefConstants.setupSteps) ?? 0;
+
+          GetIt.instance<GoRouter>().replace(getPathBasedOnStep(steps));
         } else {
           GetIt.instance<GoRouter>().replace(RoutePath.home);
         }
       });
     });
+  }
+
+  String getPathBasedOnStep(int steps) {
+    switch (steps) {
+      case 0:
+        return RoutePath.due;
+      case 1:
+        return RoutePath.gender;
+      case 2:
+        return RoutePath.babyName;
+      default:
+        return RoutePath.home;
+    }
   }
 }
