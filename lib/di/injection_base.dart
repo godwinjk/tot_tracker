@@ -4,6 +4,8 @@ import 'package:tot_tracker/db/database_helper.dart';
 import 'package:tot_tracker/presentantion/baby_bloc/baby_event_cubit.dart';
 import 'package:tot_tracker/presentantion/schedule/bloc/schedule_cubit.dart';
 import 'package:tot_tracker/presentantion/summary/bloc/summary_bloc_cubit.dart';
+import 'package:tot_tracker/presentantion/user/signin/bloc/auth_cubit.dart';
+import 'package:tot_tracker/presentantion/user/signin/bloc/sign_in_ui_cubit.dart';
 import 'package:tot_tracker/theme/color_palette.dart';
 import 'package:tot_tracker/theme/theme_cubit.dart';
 
@@ -18,7 +20,10 @@ void setupDi() {
       BabyEventCubit(getIt<DatabaseHelper>()));
   getIt.registerSingleton<SummaryCubit>(SummaryCubit(getIt<DatabaseHelper>()));
   getIt.registerSingleton<GoRouter>(router);
-  getIt.registerSingleton<ScheduleCubit>(ScheduleCubit(getIt<DatabaseHelper>()));
+  getIt
+      .registerSingleton<ScheduleCubit>(ScheduleCubit(getIt<DatabaseHelper>()));
+  getIt.registerSingleton<AuthCubit>(AuthCubit());
+  getIt.registerSingleton<SignInUiCubit>(SignInUiCubit());
 }
 
 void setColorPalette(ColorPalette colorPalette) {

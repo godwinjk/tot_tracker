@@ -5,12 +5,13 @@ import 'package:tot_tracker/presentantion/gender/gender_selection_screen.dart';
 import 'package:tot_tracker/presentantion/home/home_page.dart';
 import 'package:tot_tracker/presentantion/profile/profile_page.dart';
 import 'package:tot_tracker/presentantion/schedule/schedule_page.dart';
-import 'package:tot_tracker/presentantion/signin/sign_in_screen.dart';
 import 'package:tot_tracker/presentantion/summary/summary_page.dart';
 import 'package:tot_tracker/router/route_path.dart';
 
 import '../presentantion/landing/main_screen.dart';
+import '../presentantion/relax/relax_info_screen.dart';
 import '../presentantion/splash/splash_screen.dart';
+import '../presentantion/user/signin/sign_in_screen.dart';
 
 final router = GoRouter(
   routes: [
@@ -32,7 +33,11 @@ final router = GoRouter(
     ),
     GoRoute(
       path: RoutePath.login,
-      builder: (context, state) => const SignInPage(),
+      builder: (context, state) => SignInPage(),
+    ),
+    GoRoute(
+      path: RoutePath.waiting,
+      builder: (context, state) => const RelaxInfoScreen(),
     ),
     ShellRoute(
         builder: (context, state, child) => MainScreen(

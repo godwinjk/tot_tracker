@@ -8,6 +8,8 @@ import 'package:tot_tracker/di/injection_base.dart';
 import 'package:tot_tracker/presentantion/baby_bloc/baby_event_cubit.dart';
 import 'package:tot_tracker/presentantion/schedule/bloc/schedule_cubit.dart';
 import 'package:tot_tracker/presentantion/summary/bloc/summary_bloc_cubit.dart';
+import 'package:tot_tracker/presentantion/user/signin/bloc/auth_cubit.dart';
+import 'package:tot_tracker/presentantion/user/signin/bloc/sign_in_ui_cubit.dart';
 import 'package:tot_tracker/router/app_router.dart';
 import 'package:tot_tracker/theme/color_palette.dart';
 import 'package:tot_tracker/theme/theme_cubit.dart';
@@ -104,6 +106,12 @@ class _MyAppState extends State<MyApp> {
         ),
         BlocProvider(
           create: (_) => getIt<ScheduleCubit>(),
+        ),
+        BlocProvider(
+          create: (_) => getIt<AuthCubit>()..initialize(),
+        ),
+        BlocProvider(
+          create: (_) => getIt<SignInUiCubit>(),
         ),
       ],
       child: BlocBuilder<ThemeCubit, ThemeData>(

@@ -54,13 +54,20 @@ class _SplashScreenState extends State<SplashScreen> {
         final settingsCompleted =
             pref.getBool(SharedPrefConstants.settingsCompleted) ?? false;
         if (!settingsCompleted) {
+          int due = pref.getInt(SharedPrefConstants.dueDate) ??
+              DateTime.now().millisecondsSinceEpoch;
+          if (due > 0 && due > DateTime.now().millisecondsSinceEpoch) {
+            GetIt.instance<GoRouter>().replace(RoutePath.waiting);
+            return;
+          }
           int steps = pref.getInt(SharedPrefConstants.setupSteps) ?? 0;
-
           GetIt.instance<GoRouter>().replace(getPathBasedOnStep(steps));
         } else {
           GetIt.instance<GoRouter>().replace(RoutePath.home);
         }
       });
+
+      GetIt.instance<GoRouter>().replace(RoutePath.login);
     });
   }
 
@@ -72,6 +79,8 @@ class _SplashScreenState extends State<SplashScreen> {
         return RoutePath.gender;
       case 2:
         return RoutePath.babyName;
+      case 3:
+        return RoutePath.login;
       default:
         return RoutePath.home;
     }

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tot_tracker/persistence/shared_pref_const.dart';
 import 'package:tot_tracker/router/route_path.dart';
 
 class MainScreen extends StatefulWidget {
@@ -12,7 +14,12 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  final _tabs = [RoutePath.summary, RoutePath.home,RoutePath.schedule,  RoutePath.summary];
+  final _tabs = [
+    RoutePath.summary,
+    RoutePath.home,
+    RoutePath.schedule,
+    RoutePath.summary
+  ];
   int _currentIndex = 1;
 
   void _onTabTapped(int index) {
@@ -27,6 +34,20 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: FutureBuilder(
+            future: SharedPreferences.getInstance(),
+            builder: (_, snapshot) {
+              if (snapshot.hasData) {
+                String name =
+                    snapshot.data?.getString(SharedPrefConstants.babyName) ??
+                        '';
+                return Text('Hello $name');
+              } else {
+                return const Text('Hello');
+              }
+            }),
+      ),
       body: widget.child,
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,

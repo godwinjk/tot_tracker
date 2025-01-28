@@ -7,6 +7,6 @@ class RoutePath {
   static const profile = '/profile';
   static const summary = '/summary';
   static const login = '/login';
-  static const signup = '/signup';
   static const schedule = '/schedule';
+  static const waiting = '/waiting';
 }

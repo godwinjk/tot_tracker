@@ -7,6 +7,7 @@ import 'package:tot_tracker/persistence/shared_pref_const.dart';
 import 'package:tot_tracker/res/asset_const.dart';
 import 'package:tot_tracker/theme/color_palette.dart';
 import 'package:tot_tracker/theme/theme_cubit.dart';
+import 'package:tot_tracker/util/setup_steps.dart';
 
 import '../../router/route_path.dart';
 
@@ -221,7 +222,7 @@ class _GenderSelectionScreenState extends State<GenderSelectionScreen> {
         GetIt.instance<ThemeCubit>().updateTheme(GirlColorPalette());
       }
       SharedPreferences.getInstance().then((pref) {
-        pref.setInt(SharedPrefConstants.setupSteps, 2);
+        pref.setInt(SharedPrefConstants.setupSteps, SetupSteps.name);
       });
       GetIt.instance<GoRouter>().go(RoutePath.babyName);
     });

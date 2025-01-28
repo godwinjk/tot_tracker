@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tot_tracker/persistence/shared_pref_const.dart';
 import 'package:tot_tracker/res/asset_const.dart';
 import 'package:tot_tracker/router/route_path.dart';
+import 'package:tot_tracker/util/setup_steps.dart';
 
 import '../../di/injection_base.dart';
 
@@ -69,9 +70,16 @@ class _WhenAreDueScreenState extends State<WhenAreDueScreen> {
     if (picked != null) {
       SharedPreferences.getInstance().then((pref) {
         pref.setInt(SharedPrefConstants.dueDate, picked.millisecondsSinceEpoch);
-        pref.setInt(SharedPrefConstants.setupSteps, 1);
+        pref.setInt(SharedPrefConstants.setupSteps, SetupSteps.gender);
 
-        getIt<GoRouter>().go(RoutePath.gender);
+        if (DateTime.now().millisecondsSinceEpoch <
+            picked.millisecondsSinceEpoch) {
+          pref.setInt(SharedPrefConstants.setupSteps, SetupSteps.due);
+          getIt<GoRouter>().go(RoutePath.waiting);
+        } else {
+          pref.setInt(SharedPrefConstants.setupSteps, SetupSteps.gender);
+          getIt<GoRouter>().go(RoutePath.gender);
+        }
       });
     }
   }

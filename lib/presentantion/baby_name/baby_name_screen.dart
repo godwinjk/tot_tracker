@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tot_tracker/router/route_path.dart';
 
 import '../../persistence/shared_pref_const.dart';
+import '../../util/setup_steps.dart';
 
 class BabyNameScreen extends StatefulWidget {
   const BabyNameScreen({super.key});
@@ -50,7 +51,8 @@ class _BabyNameScreenState extends State<BabyNameScreen> {
                       _navigateToNext();
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                        content: Text('Please select one and continue'),
+                        content:
+                            Text('Please enter your baby name to continue'),
                       ));
                     }
                   },
@@ -72,13 +74,10 @@ class _BabyNameScreenState extends State<BabyNameScreen> {
   }
 
   void _navigateToNext() {
-    Future.delayed(const Duration(seconds: 2), () {
-      SharedPreferences.getInstance().then((pref) {
-        pref.setBool(SharedPrefConstants.settingsCompleted, true);
-        pref.setInt(SharedPrefConstants.setupSteps, 0);
-
-        GetIt.instance<GoRouter>().replace(RoutePath.home);
-      });
+    SharedPreferences.getInstance().then((pref) {
+      pref.setString(SharedPrefConstants.babyName, _controller.text);
+      pref.setInt(SharedPrefConstants.setupSteps, SetupSteps.login);
+      GetIt.instance<GoRouter>().replace(RoutePath.login);
     });
   }
 }

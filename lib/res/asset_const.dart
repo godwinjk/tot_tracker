@@ -7,4 +7,6 @@ class AssetConstant {
   static const String iconBabyBoy = "assets/icon/icon_baby_boy.png";
   static const String iconBabyGirl = "assets/icon/icon_baby_girl.png";
   static const String iconBabyAny = "assets/icon/icon_baby_any.png";
+
+  static const String google = "assets/images/google.png";
 }
