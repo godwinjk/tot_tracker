@@ -3,11 +3,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tot_tracker/db/database_helper.dart';
 import 'package:tot_tracker/persistence/shared_pref_const.dart';
-import 'package:tot_tracker/presentantion/model/baby_event.dart';
-import 'package:tot_tracker/presentantion/model/baby_event_test_data.dart';
-import 'package:tot_tracker/presentantion/model/baby_event_type.dart';
-import 'package:tot_tracker/presentantion/model/selection_type.dart';
+import 'package:tot_tracker/presentantion/home/model/dashboard_model.dart';
 import 'package:tot_tracker/util/baby_event_util.dart';
+
+import '../../../util/test_util.dart';
+import '../model/baby_event.dart';
+import '../model/baby_event_test_data.dart';
+import '../model/baby_event_type.dart';
+import '../model/selection_type.dart';
 
 part 'baby_event_state.dart';
 
@@ -23,20 +26,63 @@ class BabyEventCubit extends Cubit<BabyEventState> {
 
   FilterType filterType = FilterType.week;
   BabyEventType filterEventType = BabyEventType.all;
+  late int babyBornEpoch;
 
   void load() async {
     final pref = await SharedPreferences.getInstance();
     final type = pref.getString(SharedPrefConstants.defaultFilterType) ??
         FilterType.week.toShortString();
-
+    babyBornEpoch = pref.getInt(SharedPrefConstants.dueDate) ?? 0;
     filterType = fromString(type);
     events = [];
-    if (false) {
-      events = await _databaseHelper.getBabyEvents();
-    } else {
+    if (TestUtil.isTesting) {
       events = BabyEventTestData.getTestData();
+    } else {
+      events = await _databaseHelper.getBabyEvents();
     }
     filter(type: filterType, eventType: filterEventType);
+  }
+
+  void loadForDashboard(FilterType type) async {
+    final pref = await SharedPreferences.getInstance();
+    // final type = pref.getString(SharedPrefConstants.defaultFilterType) ??
+    //     FilterType.week.toShortString();
+    babyBornEpoch = pref.getInt(SharedPrefConstants.dueDate) ?? 0;
+    filterType = type;
+    events = [];
+    if (TestUtil.isTesting) {
+      events = BabyEventTestData.getTestData();
+    } else {
+      events = await _databaseHelper.getBabyEvents();
+    }
+
+    Map<int, double> babyWeightMap = {
+      for (var event
+          in BabyEventUtils.filterByType(events, BabyEventType.weight))
+        getWeeksSinceBirth(event.eventTime, babyBornEpoch): event.quantity
+    };
+    final filterData = BabyEventUtils.filterByLast24(events, DateTime.now());
+    final wee = BabyEventUtils.filterByType(filterData, BabyEventType.wee);
+    final poop = BabyEventUtils.filterByType(filterData, BabyEventType.poop);
+    final weight =
+        BabyEventUtils.filterByType(filterData, BabyEventType.weight);
+
+    final feed = BabyEventUtils.filterByType(filterData, BabyEventType.nursing);
+
+    final babyWeight = babyWeightMap.values.last;
+
+    final milk = feed.fold(0.0, (sum, event) => sum + event.quantity);
+    DashboardModel model = DashboardModel(
+        feed: feed,
+        wee: wee,
+        weight: weight,
+        poop: poop,
+        type: type,
+        babyWeight: babyWeight,
+        consumedMilk: milk);
+
+    emit(
+        BabyEventLoaded(events, type, BabyEventType.all, babyWeightMap, model));
   }
 
   void addEvent(BabyEvent event) {
@@ -56,7 +102,13 @@ class BabyEventCubit extends Cubit<BabyEventState> {
     }
     _filterBasedOnEventType(filterEvents, filterEventType);
 
-    emit(BabyEventLoaded(filterEvents, filterType, filterEventType));
+    Map<int, double> babyWeightMap = {
+      for (var event
+          in BabyEventUtils.filterByType(events, BabyEventType.weight))
+        getWeeksSinceBirth(event.eventTime, babyBornEpoch): event.quantity
+    };
+    emit(BabyEventLoaded(
+        filterEvents, filterType, filterEventType, babyWeightMap, null));
   }
 
   void _filterBasedOnType(List<BabyEvent> events, FilterType type) {
@@ -96,5 +148,9 @@ class BabyEventCubit extends Cubit<BabyEventState> {
     } else {
       filterEvents = BabyEventUtils.filterByType(events, type);
     }
+  }
+
+  int getWeeksSinceBirth(int epochTime, int birthEpoch) {
+    return ((epochTime - birthEpoch) / (7 * 24 * 60 * 60 * 1000)).floor();
   }
 }

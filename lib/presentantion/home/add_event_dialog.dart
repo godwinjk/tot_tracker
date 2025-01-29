@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tot_tracker/theme/color_palette.dart';
-import '../baby_bloc/baby_event_cubit.dart';
-import '../model/baby_event.dart';
-import '../model/baby_event_type.dart';
+import 'baby_bloc/baby_event_cubit.dart';
+import 'model/baby_event.dart';
+import 'model/baby_event_type.dart';
 
 class AddEventDialog extends StatefulWidget {
   @override
@@ -14,6 +15,7 @@ class _AddEventDialogState extends State<AddEventDialog> {
   bool _isNursing = false;
   bool _isPoop = false;
   bool _isWee = false;
+  bool _isWeight = false;
 
   // Nursing properties
   double _nursingTime = 1; // Slider for feeding time
@@ -31,6 +33,10 @@ class _AddEventDialogState extends State<AddEventDialog> {
   double _weeQuantity = 1; // Water emoji selector
   final TextEditingController _weeInfoController = TextEditingController();
 
+  //Weight
+  final TextEditingController _addWeightController = TextEditingController();
+
+  double weight = 0;
   final List<String> _colors = ['Red', 'Black', 'Yellow', 'Green', 'Other'];
 
   @override
@@ -58,9 +64,18 @@ class _AddEventDialogState extends State<AddEventDialog> {
               value: _isWee,
               onChanged: (value) => setState(() => _isWee = value!),
             ),
-
+            CheckboxListTile(
+              title: Text('Add Weight'),
+              value: _isWeight,
+              onChanged: (value) => setState(() => _isWeight = value!),
+            ),
             // Nursing section
             if (_isNursing) ...[
+              SizedBox(height: 10),
+              Text(
+                'Nursing',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
               SizedBox(height: 10),
               Text('Nursing Time (minutes)'),
               Row(
@@ -118,6 +133,11 @@ class _AddEventDialogState extends State<AddEventDialog> {
             // Poop section
             if (_isPoop) ...[
               SizedBox(height: 10),
+              Text(
+                'Poop',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 10),
               Text('Poop Quantity'),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -167,6 +187,11 @@ class _AddEventDialogState extends State<AddEventDialog> {
             // Wee section
             if (_isWee) ...[
               SizedBox(height: 10),
+              Text(
+                'Poop',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 10),
               Text('Wee Quantity'),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -190,6 +215,25 @@ class _AddEventDialogState extends State<AddEventDialog> {
                 decoration: InputDecoration(
                     border: OutlineInputBorder(),
                     labelText: 'Additional Information(Optional)'),
+              ),
+            ],
+            if (_isWeight) ...[
+              SizedBox(height: 10),
+              Text(
+                'Add Weight',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              TextField(
+                keyboardType: TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*'))
+                ],
+                controller: _addWeightController,
+                decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Add weight (in KG)'),
               ),
             ],
           ],
@@ -231,6 +275,15 @@ class _AddEventDialogState extends State<AddEventDialog> {
                   nursingTime: 0,
                   quantity: _weeQuantity,
                   info: _weeInfoController.text,
+                  poopColor: ''));
+            }
+            if (_isWeight) {
+              events.add(BabyEvent(
+                  type: BabyEventType.weight,
+                  eventTime: DateTime.now().millisecondsSinceEpoch,
+                  nursingTime: 0,
+                  quantity: double.tryParse(_addWeightController.text) ?? 0,
+                  info: 'Added weight',
                   poopColor: ''));
             }
 

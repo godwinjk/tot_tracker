@@ -1,7 +1,6 @@
 import 'dart:math';
 
-import 'package:tot_tracker/presentantion/model/baby_event.dart';
-
+import 'baby_event.dart';
 import 'baby_event_type.dart';
 
 class BabyEventTestData {
@@ -65,16 +64,44 @@ class BabyEventTestData {
         );
       }
     }
-
+    events.addAll(generateBabyWeightEvents());
     // Sort events by eventTime
     events.sort((a, b) => a.eventTime.compareTo(b.eventTime));
 
-    // Print results
-    for (var event in events) {
-      print(event);
-    }
 
     return events;
+  }
+
+  // Generate a random event time within a specific week
+  static int generateRandomEventTimeForWeight(
+      int year, int month, int week, Random random) {
+    DateTime startOfWeek =
+        DateTime(year, month, 1).add(Duration(days: week * 7));
+    return startOfWeek.millisecondsSinceEpoch +
+        random.nextInt(7 * 24 * 60 * 60 * 1000); // Random within that week
+  }
+
+// Generate 52-week weight events
+  static List<BabyEvent> generateBabyWeightEvents() {
+    Random random = Random();
+    List<BabyEvent> babyWeightEvents = [];
+    double weight = 3.0; // Start weight at birth
+
+    for (int week = 0; week < 52; week++) {
+      babyWeightEvents.add(BabyEvent(
+        type: BabyEventType.weight,
+        eventTime: generateRandomEventTimeForWeight(2025, 1, week, random),
+        quantity: double.parse(weight.toStringAsFixed(2)),
+        // Round to 2 decimals
+        info: 'Weight recorded at week $week',
+        nursingTime: 0,
+        poopColor: '',
+      ));
+      weight +=
+          0.15 + (random.nextDouble() * 0.05); // Increase weight gradually
+    }
+
+    return babyWeightEvents;
   }
 
 // Helper function to generate a random event time for a specific day

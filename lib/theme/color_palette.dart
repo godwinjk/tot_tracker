@@ -25,7 +25,7 @@ class BoyColorPalette extends ColorPalette {
   @override
   Color get primary => const Color(0xFFBBDEFB); // Baby Blue
   @override
-  Color get secondary => const Color(0xFF80DEEA); // Light Teal
+  Color get secondary => const Color(0xFF2FA193); // Light Teal
   @override
   Color get accent => const Color(0xFFFFEB3B); // Soft Yellow
   @override
@@ -58,7 +58,7 @@ class GirlColorPalette extends ColorPalette {
   @override
   Color get primary => const Color(0xFFF8BBD0); // Soft Pink
   @override
-  Color get secondary => const Color(0xFFE1BEE7); // Lavender
+  Color get secondary => const Color(0xFF9D68A5); // Lavender
   @override
   Color get accent => const Color(0xFFFFCDD2); // Light Coral
   @override
@@ -66,9 +66,9 @@ class GirlColorPalette extends ColorPalette {
   @override
   Color get bottomNavBackground => const Color(0xFFFFF8E1); // Light Cream
   @override
-  Color get textColor => const Color(0xFF607D8B); // Dark Gray
+  Color get textColor => const Color(0xFF273237); // Dark Gray
   @override
-  Color get buttonColor => const Color(0xFFE91E63); // Bright Pink
+  Color get buttonColor => const Color(0xFFF675A1); // Bright Pink
 
   @override
   Color get darkPrimary => const Color(0xFFF48FB1); // Muted Pink
@@ -99,7 +99,7 @@ class NeutralColorPalette extends ColorPalette {
   @override
   Color get bottomNavBackground => const Color(0xFFFFFDE7); // Cream
   @override
-  Color get textColor => const Color(0xFF455A64); // Dark Gray
+  Color get textColor => const Color(0xFF21292E); // Dark Gray
   @override
   Color get buttonColor => const Color(0xFFFDD835); // Bright Yellow
 

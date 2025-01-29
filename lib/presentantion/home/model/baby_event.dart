@@ -1,5 +1,6 @@
-import 'package:tot_tracker/presentantion/model/baby_event_type.dart';
 import 'package:equatable/equatable.dart';
+
+import 'baby_event_type.dart';
 
 class BabyEvent extends Equatable {
   final int? id;

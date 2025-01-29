@@ -38,8 +38,7 @@ class SignInPage extends StatelessWidget {
                 .showSnackBar(SnackBar(content: Text(state.message)));
           } else if (state is AuthAuthenticated) {
             SharedPreferences.getInstance().then((pref) {
-              pref.setInt(
-                  SharedPrefConstants.settingsCompleted, SetupSteps.home);
+              pref.setBool(SharedPrefConstants.settingsCompleted, true);
               GetIt.instance<GoRouter>().replace(RoutePath.home);
             });
           }

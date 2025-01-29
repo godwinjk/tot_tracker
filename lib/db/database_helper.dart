@@ -2,7 +2,7 @@
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
-import '../presentantion/model/baby_event.dart';
+import '../presentantion/home/model/baby_event.dart';
 import '../presentantion/schedule/model/notification_schedule.dart';
 
 class DatabaseHelper {

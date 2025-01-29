@@ -6,8 +6,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tot_tracker/presentantion/common/empty_placeholder_widget.dart';
 import 'package:tot_tracker/presentantion/summary/bloc/summary_bloc_cubit.dart';
 
-import '../model/baby_event_type.dart';
-import '../model/selection_type.dart';
+import '../home/model/baby_event_type.dart';
+import '../home/model/selection_type.dart';
+
 
 class SummaryPage extends StatefulWidget {
   const SummaryPage({super.key});

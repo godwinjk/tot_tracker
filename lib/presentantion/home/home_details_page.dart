@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:tot_tracker/presentantion/baby_bloc/baby_event_cubit.dart';
 import 'package:tot_tracker/presentantion/common/empty_placeholder_widget.dart';
-import 'package:tot_tracker/presentantion/model/baby_event_type.dart';
-import 'package:tot_tracker/presentantion/model/selection_type.dart';
 
 import '../../util/date_time_util.dart';
-import '../model/baby_event.dart';
 import 'add_event_dialog.dart';
+import 'baby_bloc/baby_event_cubit.dart';
+import 'model/baby_event.dart';
+import 'model/baby_event_type.dart';
+import 'model/selection_type.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+class HomeDetailsPage extends StatefulWidget {
+  const HomeDetailsPage({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<HomeDetailsPage> createState() => _HomeDetailsPageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomeDetailsPageState extends State<HomeDetailsPage> {
   @override
   void initState() {
     context.read<BabyEventCubit>().load();
@@ -28,70 +28,74 @@ class _HomePageState extends State<HomePage> {
     return BlocBuilder<BabyEventCubit, BabyEventState>(
       builder: (_, state) {
         if (state is BabyEventLoaded) {
-          return SafeArea(
-            child: Scaffold(
-              body: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  _getFilterDateChips(state),
-                  SizedBox(
-                    height: 20,
+          return Scaffold(
+            appBar: AppBar(
+              title: Text('Events'),
+            ),
+            body: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _getFilterDateChips(state),
+                SizedBox(
+                  height: 20,
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 40),
+                  child: Container(
+                    width: double.infinity,
+                    height: 1,
+                    color: Colors.grey,
                   ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 40),
-                    child: Container(
-                      width: double.infinity,
-                      height: 1,
-                      color: Colors.grey,
-                    ),
+                ),
+                SizedBox(
+                  height: 20,
+                ),
+                _getFilterEventChips(state),
+                SizedBox(
+                  height: 20,
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 40),
+                  child: Container(
+                    width: double.infinity,
+                    height: 1,
+                    color: Colors.grey,
                   ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  _getFilterEventChips(state),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 40),
-                    child: Container(
-                      width: double.infinity,
-                      height: 1,
-                      color: Colors.grey,
-                    ),
-                  ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  state.events.isNotEmpty
-                      ? Expanded(
-                          child: ListView.builder(
-                            shrinkWrap: true,
-                            itemCount: state.events.length,
-                            itemBuilder: (context, index) {
-                              final event = state.events[index];
+                ),
+                SizedBox(
+                  height: 20,
+                ),
+                state.events.isNotEmpty
+                    ? Expanded(
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: state.events.length,
+                          itemBuilder: (context, index) {
+                            final event = state.events[index];
 
-                              // Render different cards based on the event type
-                              switch (event.type) {
-                                case BabyEventType.nursing:
-                                  return _buildNursingCard(event);
-                                case BabyEventType.poop:
-                                  return _buildPoopCard(event);
-                                case BabyEventType.wee:
-                                  return _buildWeeCard(event);
-                                case BabyEventType.all:
-                                  return const SizedBox.shrink();
-                              }
-                            },
-                          ),
-                        )
-                      : Expanded(child: const EmptyPlaceholderWidget()),
-                ],
-              ),
-              floatingActionButton: FloatingActionButton(
-                onPressed: () => _showAddEventDialog(context),
-                child: const Icon(Icons.add),
-              ),
+                            // Render different cards based on the event type
+                            switch (event.type) {
+                              case BabyEventType.nursing:
+                                return _buildNursingCard(event);
+                              case BabyEventType.poop:
+                                return _buildPoopCard(event);
+                              case BabyEventType.wee:
+                                return _buildWeeCard(event);
+                              case BabyEventType.all:
+                                return const SizedBox.shrink();
+                              case BabyEventType.weight:
+                                // TODO: Handle this case.
+                                return _buildWeightCard(event);
+                            }
+                          },
+                        ),
+                      )
+                    : Expanded(child: const EmptyPlaceholderWidget()),
+              ],
+            ),
+            floatingActionButton: FloatingActionButton(
+              onPressed: () => _showAddEventDialog(context),
+              child: const Icon(Icons.add),
             ),
           );
         } else {
@@ -190,6 +194,16 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  Widget _buildWeightCard(BabyEvent event) {
+    return Card(
+      color: _getCardColor(event.type),
+      margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+      child: ListTile(
+        title: _getEventTitle(event),
+      ),
+    );
+  }
+
   Widget _getEventTitle(BabyEvent event) {
     final time = formatEpochToHourMin(event.eventTime);
     if (event.type == BabyEventType.nursing) {
@@ -234,6 +248,20 @@ class _HomePageState extends State<HomePage> {
             const TextSpan(text: 'Baby weed at '),
             TextSpan(
               text: time,
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+            ),
+          ],
+        ),
+      );
+    } else if (event.type == BabyEventType.weight) {
+      return RichText(
+        maxLines: 3,
+        text: TextSpan(
+          style: DefaultTextStyle.of(context).style,
+          children: [
+            TextSpan(text: 'Baby weight'),
+            TextSpan(
+              text: '${event.quantity}',
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
             ),
           ],
@@ -360,7 +388,9 @@ class _HomePageState extends State<HomePage> {
       case BabyEventType.poop:
         return Colors.orange.shade100;
       case BabyEventType.all:
-        return Colors.white;
+        return Colors.pink.shade200;
+      case BabyEventType.weight:
+        return Colors.green.shade300;
     }
   }
 

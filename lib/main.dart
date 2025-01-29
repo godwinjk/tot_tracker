@@ -3,19 +3,18 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_native_timezone/flutter_native_timezone.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:timezone/data/latest.dart' as tzd;
+import 'package:timezone/timezone.dart' as tz;
 import 'package:tot_tracker/di/injection_base.dart';
-import 'package:tot_tracker/presentantion/baby_bloc/baby_event_cubit.dart';
+import 'package:tot_tracker/presentantion/home/baby_bloc/baby_event_cubit.dart';
 import 'package:tot_tracker/presentantion/schedule/bloc/schedule_cubit.dart';
 import 'package:tot_tracker/presentantion/summary/bloc/summary_bloc_cubit.dart';
 import 'package:tot_tracker/presentantion/user/signin/bloc/auth_cubit.dart';
 import 'package:tot_tracker/presentantion/user/signin/bloc/sign_in_ui_cubit.dart';
 import 'package:tot_tracker/router/app_router.dart';
-import 'package:tot_tracker/theme/color_palette.dart';
 import 'package:tot_tracker/theme/theme_cubit.dart';
-import 'package:flutter_native_timezone/flutter_native_timezone.dart';
-import 'package:timezone/timezone.dart' as tz;
-import 'package:timezone/data/latest.dart' as tzd;
 
 import 'firebase_options.dart';
 
@@ -91,8 +90,7 @@ class _MyAppState extends State<MyApp> {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    getIt<ThemeCubit>().updateTheme(BoyColorPalette(),
-        isDarkMode: Theme.of(context).brightness == Brightness.dark);
+    getIt<ThemeCubit>().setGenderBasedTheme(context);
     return MultiBlocProvider(
       providers: [
         BlocProvider(
@@ -114,12 +112,13 @@ class _MyAppState extends State<MyApp> {
           create: (_) => getIt<SignInUiCubit>(),
         ),
       ],
-      child: BlocBuilder<ThemeCubit, ThemeData>(
+      child: BlocBuilder<ThemeCubit, ThemeLoaded>(
         builder: (context, theme) {
           return MaterialApp.router(
             routerConfig: router,
             title: 'Baby Tracker',
-            theme: theme,
+            theme: theme.lightTheme,
+            darkTheme: theme.darkTheme,
           );
         },
       ),

@@ -2,7 +2,8 @@ import 'package:go_router/go_router.dart';
 import 'package:tot_tracker/presentantion/baby_name/baby_name_screen.dart';
 import 'package:tot_tracker/presentantion/due/when_due_screen.dart';
 import 'package:tot_tracker/presentantion/gender/gender_selection_screen.dart';
-import 'package:tot_tracker/presentantion/home/home_page.dart';
+import 'package:tot_tracker/presentantion/home/home_details_page.dart';
+import 'package:tot_tracker/presentantion/home/home_main_page.dart';
 import 'package:tot_tracker/presentantion/profile/profile_page.dart';
 import 'package:tot_tracker/presentantion/schedule/schedule_page.dart';
 import 'package:tot_tracker/presentantion/summary/summary_page.dart';
@@ -45,9 +46,14 @@ final router = GoRouter(
             ),
         routes: [
           GoRoute(
-            path: RoutePath.home,
-            builder: (context, state) => const HomePage(),
-          ),
+              path: RoutePath.home,
+              builder: (context, state) => const HomeMainPage(),
+              routes: [
+                GoRoute(
+                  path: RoutePath.detail,
+                  builder: (context, state) => const HomeDetailsPage(),
+                )
+              ]),
           GoRoute(
             path: RoutePath.summary,
             builder: (context, state) => const SummaryPage(),
@@ -60,6 +66,6 @@ final router = GoRouter(
             path: RoutePath.profile,
             builder: (context, state) => const ProfilePage(),
           ),
-        ])
+        ]),
   ],
 );

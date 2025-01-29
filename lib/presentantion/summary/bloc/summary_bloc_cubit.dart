@@ -1,16 +1,15 @@
-import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter/foundation.dart';
-import 'package:intl/intl.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tot_tracker/persistence/shared_pref_const.dart';
-import 'package:tot_tracker/presentantion/model/baby_event.dart';
-import 'package:tot_tracker/presentantion/model/baby_event_type.dart';
 
 import '../../../db/database_helper.dart';
 import '../../../util/baby_event_util.dart';
-import '../../model/baby_event_test_data.dart';
-import '../../model/selection_type.dart';
+import '../../../util/test_util.dart';
+import '../../home/model/baby_event.dart';
+import '../../home/model/baby_event_test_data.dart';
+import '../../home/model/baby_event_type.dart';
+import '../../home/model/selection_type.dart';
 import '../model/average_data.dart';
 import '../model/summary.dart';
 
@@ -28,9 +27,11 @@ class SummaryCubit extends Cubit<SummaryState> {
   late List<BabyEvent> events;
 
   void load() async {
-    final result = await _databaseHelper.getBabyEvents();
-    events = BabyEventTestData.getTestData();
-    // events = filterBasedOnThisMonth(result);
+    if (TestUtil.isTesting) {
+      events = BabyEventTestData.getTestData();
+    } else {
+      events = await _databaseHelper.getBabyEvents();
+    }
     filter();
     processData();
   }
@@ -115,6 +116,30 @@ class SummaryCubit extends Cubit<SummaryState> {
   }
 
   Map<int, int> filterBasedOnDay(List<BabyEvent> events) {
+    // Step 1: Initialize an empty map for grouping by day
+    // Step 1: Initialize an empty map for day-wise counts
+    Map<int, int> dayWiseCounts = {};
+
+    // Step 2: Iterate over the list of events
+    for (var event in events) {
+      // Convert epochTime to a DateTime object
+      DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(event.eventTime);
+
+      // Extract the day (1-31) from the DateTime object
+      int day = dateTime.day;
+
+      // Increment the count for this day in the map
+      if (dayWiseCounts.containsKey(day)) {
+        dayWiseCounts[day] = dayWiseCounts[day]! + 1;
+      } else {
+        dayWiseCounts[day] = 1;
+      }
+    }
+
+    return dayWiseCounts;
+  }
+
+  Map<int, int> filterBasedOnWeek(List<BabyEvent> events) {
     // Step 1: Initialize an empty map for grouping by day
     // Step 1: Initialize an empty map for day-wise counts
     Map<int, int> dayWiseCounts = {};

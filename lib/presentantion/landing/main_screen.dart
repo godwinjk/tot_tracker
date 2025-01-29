@@ -18,7 +18,7 @@ class _MainScreenState extends State<MainScreen> {
     RoutePath.summary,
     RoutePath.home,
     RoutePath.schedule,
-    RoutePath.summary
+    RoutePath.profile
   ];
   int _currentIndex = 1;
 
@@ -34,20 +34,20 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: FutureBuilder(
-            future: SharedPreferences.getInstance(),
-            builder: (_, snapshot) {
-              if (snapshot.hasData) {
-                String name =
-                    snapshot.data?.getString(SharedPrefConstants.babyName) ??
-                        '';
-                return Text('Hello $name');
-              } else {
-                return const Text('Hello');
-              }
-            }),
-      ),
+      // appBar: AppBar(
+      //   title: FutureBuilder(
+      //       future: SharedPreferences.getInstance(),
+      //       builder: (_, snapshot) {
+      //         if (snapshot.hasData) {
+      //           String name =
+      //               snapshot.data?.getString(SharedPrefConstants.babyName) ??
+      //                   '';
+      //           return Text('Hello $name');
+      //         } else {
+      //           return const Text('Hello');
+      //         }
+      //       }),
+      // ),
       body: widget.child,
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,

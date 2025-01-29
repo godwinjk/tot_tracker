@@ -1,6 +1,5 @@
-import 'package:tot_tracker/presentantion/model/baby_event_type.dart';
-
-import '../presentantion/model/baby_event.dart';
+import '../presentantion/home/model/baby_event.dart';
+import '../presentantion/home/model/baby_event_type.dart';
 
 class BabyEventUtils {
   // Filter events by year
@@ -50,7 +49,8 @@ class BabyEventUtils {
 
   static List<BabyEvent> filterByLast24(List<BabyEvent> events, DateTime now) {
     return events.where((event) {
-      final last24 = now.subtract(const Duration(hours: 24)).millisecondsSinceEpoch;
+      final last24 =
+          now.subtract(const Duration(hours: 24)).millisecondsSinceEpoch;
       return event.eventTime > last24;
     }).toList();
   }
