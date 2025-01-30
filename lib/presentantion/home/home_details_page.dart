@@ -262,7 +262,7 @@ class _HomeDetailsPageState extends State<HomeDetailsPage> {
         text: TextSpan(
           style: DefaultTextStyle.of(context).style,
           children: [
-            TextSpan(text: 'Baby weight'),
+            TextSpan(text: 'Baby weight '),
             TextSpan(
               text: '${event.quantity}',
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
