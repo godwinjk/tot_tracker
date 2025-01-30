@@ -9,7 +9,6 @@ import 'package:tot_tracker/presentantion/summary/bloc/summary_bloc_cubit.dart';
 import '../home/model/baby_event_type.dart';
 import '../home/model/selection_type.dart';
 
-
 class SummaryPage extends StatefulWidget {
   const SummaryPage({super.key});
 
@@ -33,84 +32,86 @@ class _SummaryPageState extends State<SummaryPage> {
             return Scaffold(
                 body: SingleChildScrollView(
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  _getFilterDateChips(state),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 40),
-                    child: Container(
-                      width: double.infinity,
-                      height: 1,
-                      color: Colors.grey,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    _getFilterDateChips(state),
+                    SizedBox(
+                      height: 20,
                     ),
-                  ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  _getFilterEventChips(state),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 40),
-                    child: Container(
-                      width: double.infinity,
-                      height: 1,
-                      color: Colors.grey,
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 40),
+                      child: Container(
+                        width: double.infinity,
+                        height: 1,
+                        color: Colors.grey,
+                      ),
                     ),
-                  ),
-                  if (state.filterType == FilterType.day ||
-                      state.filterType == FilterType.last24)
-                    _buildDayConsolidateChart(state)
-                  else
-                    _buildDailyChart(state),
-                  const Padding(
-                    padding: EdgeInsets.all(16.0),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Row(
+                    SizedBox(
+                      height: 20,
+                    ),
+                    _getFilterEventChips(state),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 40),
+                      child: Container(
+                        width: double.infinity,
+                        height: 1,
+                        color: Colors.grey,
+                      ),
+                    ),
+                    if (state.summary.feedData.isNotEmpty ||
+                        state.summary.poopData.isNotEmpty ||
+                        state.summary.weeData.isNotEmpty) ...[
+                      if (state.filterType == FilterType.day ||
+                          state.filterType == FilterType.last24)
+                        _buildDayConsolidateChart(state)
+                      else
+                        _buildDailyChart(state),
+                      const Padding(
+                        padding: EdgeInsets.all(16.0),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(
-                              Icons.warning,
-                              color: Colors.redAccent,
-                              size: 16.0, // Warning icon
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.warning,
+                                  color: Colors.redAccent,
+                                  size: 16.0, // Warning icon
+                                ),
+                                const SizedBox(width: 4.0),
+                                const Text(
+                                  "Disclaimer",
+                                  style: TextStyle(
+                                    fontSize: 14.0,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.redAccent,
+                                  ),
+                                ),
+                              ],
                             ),
-                            const SizedBox(width: 4.0),
+                            const SizedBox(height: 12.0),
                             const Text(
-                              "Disclaimer",
+                              "The upper and lower limits are derived from authentic resources, "
+                              "but they may vary depending on individual genetics, parents, "
+                              "ethnicity, baby gestation, and other factors. These values are "
+                              "only for analyzing trends. If you have concerns, please consult your doctor.",
+                              textAlign: TextAlign.justify,
                               style: TextStyle(
-                                fontSize: 14.0,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.redAccent,
+                                fontSize: 12.0,
+                                height: 1.5,
+                                color: Colors.grey,
                               ),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 12.0),
-                        const Text(
-                          "The upper and lower limits are derived from authentic resources, "
-                          "but they may vary depending on individual genetics, parents, "
-                          "ethnicity, baby gestation, and other factors. These values are "
-                          "only for analyzing trends. If you have concerns, please consult your doctor.",
-                          textAlign: TextAlign.justify,
-                          style: TextStyle(
-                            fontSize: 12.0,
-                            height: 1.5,
-                            color: Colors.grey,
-                          ),
-                        ),
-                      ],
-                    ),
-                  )
-                ],
-              ),
+                      )
+                    ] else
+                      const EmptyPlaceholderWidget(),
+                  ]),
             ));
-          } else if (state is SummaryLoadedNoItem) {
-            return const EmptyPlaceholderWidget();
           } else {
             return const Center(
               child: CircularProgressIndicator(),
@@ -214,39 +215,39 @@ class _SummaryPageState extends State<SummaryPage> {
   Widget _buildDailyChart(SummaryLoaded state) {
     return Column(
       children: [
-        if (state.eventType == BabyEventType.all ||
-            state.eventType == BabyEventType.nursing)
+        if ((state.eventType == BabyEventType.all ||
+                state.eventType == BabyEventType.nursing) &&
+            state.summary.feedData.isNotEmpty) ...[
           const SizedBox(height: 20),
-        if (state.eventType == BabyEventType.all ||
-            state.eventType == BabyEventType.nursing)
           _buildChartSection(
             title: "Feed Times",
             data: state.summary.feedData,
             upper: state.summary.feedUpperData,
             lower: state.summary.feedLowerData,
           ),
-        if (state.eventType == BabyEventType.all ||
-            state.eventType == BabyEventType.poop)
+        ],
+        if ((state.eventType == BabyEventType.all ||
+                state.eventType == BabyEventType.poop) &&
+            state.summary.poopData.isNotEmpty) ...[
           const SizedBox(height: 20),
-        if (state.eventType == BabyEventType.all ||
-            state.eventType == BabyEventType.poop)
           _buildChartSection(
             title: "Poop times",
             data: state.summary.poopData,
             upper: state.summary.poopUpperData,
             lower: state.summary.poopLowerData,
           ),
-        if (state.eventType == BabyEventType.all ||
-            state.eventType == BabyEventType.wee)
+        ],
+        if ((state.eventType == BabyEventType.all ||
+                state.eventType == BabyEventType.wee) &&
+            state.summary.weeData.isNotEmpty) ...[
           const SizedBox(height: 20),
-        if (state.eventType == BabyEventType.all ||
-            state.eventType == BabyEventType.wee)
           _buildChartSection(
             title: "Wee times",
             data: state.summary.weeData,
             upper: state.summary.weeUpperData,
             lower: state.summary.weeLowerData,
           ),
+        ],
       ],
     );
   }

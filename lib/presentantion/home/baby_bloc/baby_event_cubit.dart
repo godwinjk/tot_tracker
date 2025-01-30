@@ -1,4 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tot_tracker/db/database_helper.dart';
@@ -19,8 +22,11 @@ class BabyEventCubit extends Cubit<BabyEventState> {
       : _databaseHelper = databaseHelper,
         super(BabyEventInitial());
 
+  late FirebaseFirestore _db;
+  late FirebaseAuth _firebaseAuth;
+
   final DatabaseHelper _databaseHelper;
-  late List<BabyEvent> events;
+  List<BabyEvent> events = [];
 
   List<BabyEvent> filterEvents = [];
 
@@ -28,34 +34,53 @@ class BabyEventCubit extends Cubit<BabyEventState> {
   BabyEventType filterEventType = BabyEventType.all;
   late int babyBornEpoch;
 
-  void load() async {
+  void initial() {
+    _db = FirebaseFirestore.instance;
+    _firebaseAuth = FirebaseAuth.instance;
+  }
+
+  void load({
+    BabyEventType eventType = BabyEventType.all,
+  }) async {
     final pref = await SharedPreferences.getInstance();
-    final type = pref.getString(SharedPrefConstants.defaultFilterType) ??
-        FilterType.week.toShortString();
     babyBornEpoch = pref.getInt(SharedPrefConstants.dueDate) ?? 0;
-    filterType = fromString(type);
+
+    filterEventType = eventType;
+
     events = [];
     if (TestUtil.isTesting) {
       events = BabyEventTestData.getTestData();
     } else {
       events = await _databaseHelper.getBabyEvents();
+      final userId = _firebaseAuth.currentUser!.uid;
+      events = await getBabyEvents(userId);
     }
     filter(type: filterType, eventType: filterEventType);
   }
 
-  void loadForDashboard(FilterType type) async {
-    final pref = await SharedPreferences.getInstance();
-    // final type = pref.getString(SharedPrefConstants.defaultFilterType) ??
-    //     FilterType.week.toShortString();
-    babyBornEpoch = pref.getInt(SharedPrefConstants.dueDate) ?? 0;
-    filterType = type;
-    events = [];
-    if (TestUtil.isTesting) {
-      events = BabyEventTestData.getTestData();
-    } else {
-      events = await _databaseHelper.getBabyEvents();
-    }
+  /// 🔹 Fetch BabyEvents for a user and map them to a list
+  Future<List<BabyEvent>> getBabyEvents(String userId) async {
+    try {
+      // Reference to the baby_events collection
+      CollectionReference eventsRef =
+          _db.collection('Events').doc(userId).collection('baby_events');
 
+      // Fetch all documents
+      QuerySnapshot snapshot =
+          await eventsRef.orderBy('eventTime', descending: true).get();
+
+      // Convert each document to a BabyEvent
+      List<BabyEvent> events = snapshot.docs.map((doc) {
+        return BabyEvent.fromMap(doc.data() as Map<String, dynamic>);
+      }).toList();
+
+      return events; // Return as a list
+    } catch (e) {
+      return [];
+    }
+  }
+
+  DashboardModel afterGetData() {
     Map<int, double> babyWeightMap = {
       for (var event
           in BabyEventUtils.filterByType(events, BabyEventType.weight))
@@ -69,25 +94,35 @@ class BabyEventCubit extends Cubit<BabyEventState> {
 
     final feed = BabyEventUtils.filterByType(filterData, BabyEventType.nursing);
 
-    final babyWeight = babyWeightMap.values.last;
+    final babyWeight =
+        babyWeightMap.values.isNotEmpty ? babyWeightMap.values.last : 0.0;
 
     final milk = feed.fold(0.0, (sum, event) => sum + event.quantity);
-    DashboardModel model = DashboardModel(
+    return DashboardModel(
         feed: feed,
         wee: wee,
         weight: weight,
         poop: poop,
-        type: type,
+        type: filterType,
         babyWeight: babyWeight,
         consumedMilk: milk);
-
-    emit(
-        BabyEventLoaded(events, type, BabyEventType.all, babyWeightMap, model));
   }
 
-  void addEvent(BabyEvent event) {
+  void addEvent(BabyEvent event) async {
     _databaseHelper.insertBabyEvent(event);
-    load();
+
+    try {
+      final userId = _firebaseAuth.currentUser!.uid;
+      _db
+          .collection('Events')
+          .doc(userId)
+          .collection('baby_events')
+          .doc('${event.eventTime}')
+          .set(event.toMap());
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+    // load();
   }
 
   void filter({FilterType? type, BabyEventType? eventType}) {
@@ -107,8 +142,10 @@ class BabyEventCubit extends Cubit<BabyEventState> {
           in BabyEventUtils.filterByType(events, BabyEventType.weight))
         getWeeksSinceBirth(event.eventTime, babyBornEpoch): event.quantity
     };
+
+    final model = afterGetData();
     emit(BabyEventLoaded(
-        filterEvents, filterType, filterEventType, babyWeightMap, null));
+        filterEvents, filterType, filterEventType, babyWeightMap, model));
   }
 
   void _filterBasedOnType(List<BabyEvent> events, FilterType type) {

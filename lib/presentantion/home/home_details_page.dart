@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tot_tracker/presentantion/common/empty_placeholder_widget.dart';
+import 'package:tot_tracker/theme/card_color_theme.dart';
 
 import '../../util/date_time_util.dart';
 import 'add_event_dialog.dart';
@@ -10,7 +11,9 @@ import 'model/baby_event_type.dart';
 import 'model/selection_type.dart';
 
 class HomeDetailsPage extends StatefulWidget {
-  const HomeDetailsPage({super.key});
+  const HomeDetailsPage({super.key, this.eventType = BabyEventType.all});
+
+  final BabyEventType eventType;
 
   @override
   State<HomeDetailsPage> createState() => _HomeDetailsPageState();
@@ -19,7 +22,7 @@ class HomeDetailsPage extends StatefulWidget {
 class _HomeDetailsPageState extends State<HomeDetailsPage> {
   @override
   void initState() {
-    context.read<BabyEventCubit>().load();
+    context.read<BabyEventCubit>().load(eventType: widget.eventType);
     super.initState();
   }
 
@@ -110,7 +113,7 @@ class _HomeDetailsPageState extends State<HomeDetailsPage> {
 // Nursing Card
   Widget _buildNursingCard(BabyEvent event) {
     return Card(
-      color: _getCardColor(event.type),
+      color: _getCardColor(context, event.type),
       margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
       child: ListTile(
         title: _getEventTitle(event),
@@ -133,7 +136,7 @@ class _HomeDetailsPageState extends State<HomeDetailsPage> {
   // Poop Card
   Widget _buildPoopCard(BabyEvent event) {
     return Card(
-      color: _getCardColor(event.type),
+      color: _getCardColor(context, event.type),
       margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
       child: ListTile(
         title: _getEventTitle(event),
@@ -163,7 +166,7 @@ class _HomeDetailsPageState extends State<HomeDetailsPage> {
   // Wee Card
   Widget _buildWeeCard(BabyEvent event) {
     return Card(
-      color: _getCardColor(event.type),
+      color: _getCardColor(context, event.type),
       margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
       child: ListTile(
         title: _getEventTitle(event),
@@ -196,7 +199,7 @@ class _HomeDetailsPageState extends State<HomeDetailsPage> {
 
   Widget _buildWeightCard(BabyEvent event) {
     return Card(
-      color: _getCardColor(event.type),
+      color: _getCardColor(context, event.type),
       margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
       child: ListTile(
         title: _getEventTitle(event),
@@ -379,18 +382,19 @@ class _HomeDetailsPageState extends State<HomeDetailsPage> {
     );
   }
 
-  Color _getCardColor(BabyEventType type) {
+  Color _getCardColor(BuildContext context, BabyEventType type) {
+    CardColorTheme theme = Theme.of(context).extension<CardColorTheme>()!;
     switch (type) {
       case BabyEventType.nursing:
-        return Colors.lightBlue.shade100;
+        return theme.cardColors[0];
       case BabyEventType.wee:
-        return Colors.lightGreen.shade100;
+        return theme.cardColors[1];
       case BabyEventType.poop:
-        return Colors.orange.shade100;
-      case BabyEventType.all:
-        return Colors.pink.shade200;
+        return theme.cardColors[2];
       case BabyEventType.weight:
-        return Colors.green.shade300;
+        return theme.cardColors[3];
+      case BabyEventType.all:
+        return theme.cardColors[4];
     }
   }
 

@@ -3,20 +3,32 @@ import 'package:flutter/material.dart';
 abstract class ColorPalette {
   // Common color properties
   Color get primary;
+
   Color get secondary;
+
   Color get accent;
+
   Color get appBarBackground;
+
   Color get bottomNavBackground;
+
   Color get textColor;
+
   Color get buttonColor;
 
   // Dark mode properties
   Color get darkPrimary;
+
   Color get darkSecondary;
+
   Color get darkAccent;
+
   Color get darkAppBarBackground;
+
   Color get darkBottomNavBackground;
+
   Color get darkTextColor;
+
   Color get darkButtonColor;
 }
 
@@ -46,11 +58,12 @@ class BoyColorPalette extends ColorPalette {
   @override
   Color get darkAppBarBackground => const Color(0xFF37474F); // Dark Blue Gray
   @override
-  Color get darkBottomNavBackground => const Color(0xFF263238); // Dark Slate Gray
+  Color get darkBottomNavBackground =>
+      const Color(0xFF263238); // Dark Slate Gray
   @override
   Color get darkTextColor => const Color(0xFFB0BEC5); // Light Gray
   @override
-  Color get darkButtonColor => const Color(0xFF90CAF9); // Light Blue
+  Color get darkButtonColor => const Color(0xFF254865); // Light Blue
 }
 
 // Girl Color Palette
@@ -83,7 +96,7 @@ class GirlColorPalette extends ColorPalette {
   @override
   Color get darkTextColor => const Color(0xFFB0BEC5); // Light Gray
   @override
-  Color get darkButtonColor => const Color(0xFFF06292); // Light Pink
+  Color get darkButtonColor => const Color(0xFF732C44); // Light Pink
 }
 
 // Neutral Color Palette
@@ -112,9 +125,10 @@ class NeutralColorPalette extends ColorPalette {
   @override
   Color get darkAppBarBackground => const Color(0xFF37474F); // Dark Gray
   @override
-  Color get darkBottomNavBackground => const Color(0xFF263238); // Dark Slate Gray
+  Color get darkBottomNavBackground =>
+      const Color(0xFF263238); // Dark Slate Gray
   @override
   Color get darkTextColor => const Color(0xFFB0BEC5); // Light Gray
   @override
-  Color get darkButtonColor => const Color(0xFFFDD835); // Muted Yellow
+  Color get darkButtonColor => const Color(0xFF70601E); // Muted Yellow
 }

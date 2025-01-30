@@ -1,4 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tot_tracker/persistence/shared_pref_const.dart';
@@ -26,14 +28,46 @@ class SummaryCubit extends Cubit<SummaryState> {
   List<BabyEvent> filterEvents = [];
   late List<BabyEvent> events;
 
+  late FirebaseFirestore _db;
+  late FirebaseAuth _firebaseAuth;
+
+  void initial() {
+    _db = FirebaseFirestore.instance;
+    _firebaseAuth = FirebaseAuth.instance;
+  }
+
   void load() async {
     if (TestUtil.isTesting) {
       events = BabyEventTestData.getTestData();
     } else {
-      events = await _databaseHelper.getBabyEvents();
+      // events = await _databaseHelper.getBabyEvents();
+      final userId = _firebaseAuth.currentUser!.uid;
+      events = await getBabyEvents(userId);
     }
     filter();
     processData();
+  }
+
+  /// 🔹 Fetch BabyEvents for a user and map them to a list
+  Future<List<BabyEvent>> getBabyEvents(String userId) async {
+    try {
+      // Reference to the baby_events collection
+      CollectionReference eventsRef =
+          _db.collection('Events').doc(userId).collection('baby_events');
+
+      // Fetch all documents
+      QuerySnapshot snapshot =
+          await eventsRef.orderBy('eventTime', descending: true).get();
+
+      // Convert each document to a BabyEvent
+      List<BabyEvent> events = snapshot.docs.map((doc) {
+        return BabyEvent.fromMap(doc.data() as Map<String, dynamic>);
+      }).toList();
+
+      return events; // Return as a list
+    } catch (e) {
+      return [];
+    }
   }
 
   void processData() async {
@@ -76,10 +110,6 @@ class SummaryCubit extends Cubit<SummaryState> {
     final feedLower = feedDayBasis.map((key, value) =>
         MapEntry(key, AverageDataConst.feedsLower[months] ?? 0));
 
-    if (poopDayBasis.isEmpty && weeDayBasis.isEmpty && feedDayBasis.isEmpty) {
-      emit(const SummaryLoadedNoItem());
-      return;
-    }
     emit(SummaryLoaded(
         SummaryChartData(
           poopData: poopDayBasis,

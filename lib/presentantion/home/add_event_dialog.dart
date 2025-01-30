@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:tot_tracker/theme/color_palette.dart';
+
+import '../../util/date_time_util.dart';
 import 'baby_bloc/baby_event_cubit.dart';
 import 'model/baby_event.dart';
 import 'model/baby_event_type.dart';
@@ -38,6 +39,8 @@ class _AddEventDialogState extends State<AddEventDialog> {
 
   double weight = 0;
   final List<String> _colors = ['Red', 'Black', 'Yellow', 'Green', 'Other'];
+
+  DateTime eventTime = DateTime.now();
 
   @override
   Widget build(BuildContext context) {
@@ -236,6 +239,20 @@ class _AddEventDialogState extends State<AddEventDialog> {
                     labelText: 'Add weight (in KG)'),
               ),
             ],
+            Wrap(
+              children: [
+                Text('Event Time: '),
+                Text(
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                  formatDateTime(eventTime),
+                ),
+                ElevatedButton(
+                    onPressed: () {
+                      _selectDate(context);
+                    },
+                    child: Text('Change'))
+              ],
+            )
           ],
         ),
       ),
@@ -250,7 +267,7 @@ class _AddEventDialogState extends State<AddEventDialog> {
             if (_isNursing) {
               events.add(BabyEvent(
                   type: BabyEventType.nursing,
-                  eventTime: DateTime.now().millisecondsSinceEpoch,
+                  eventTime: eventTime.millisecondsSinceEpoch,
                   nursingTime: _nursingTime.toInt(),
                   quantity: _milkAmount,
                   info: _nursingInfoController.text,
@@ -260,7 +277,7 @@ class _AddEventDialogState extends State<AddEventDialog> {
             if (_isPoop) {
               events.add(BabyEvent(
                   type: BabyEventType.poop,
-                  eventTime: DateTime.now().millisecondsSinceEpoch,
+                  eventTime: eventTime.millisecondsSinceEpoch,
                   nursingTime: 0,
                   quantity: _poopQuantity,
                   info: _weeInfoController.text,
@@ -271,7 +288,7 @@ class _AddEventDialogState extends State<AddEventDialog> {
             if (_isWee) {
               events.add(BabyEvent(
                   type: BabyEventType.wee,
-                  eventTime: DateTime.now().millisecondsSinceEpoch,
+                  eventTime: eventTime.millisecondsSinceEpoch,
                   nursingTime: 0,
                   quantity: _weeQuantity,
                   info: _weeInfoController.text,
@@ -280,7 +297,7 @@ class _AddEventDialogState extends State<AddEventDialog> {
             if (_isWeight) {
               events.add(BabyEvent(
                   type: BabyEventType.weight,
-                  eventTime: DateTime.now().millisecondsSinceEpoch,
+                  eventTime: eventTime.millisecondsSinceEpoch,
                   nursingTime: 0,
                   quantity: double.tryParse(_addWeightController.text) ?? 0,
                   info: 'Added weight',
@@ -297,5 +314,31 @@ class _AddEventDialogState extends State<AddEventDialog> {
         ),
       ],
     );
+  }
+
+  Future<void> _selectDate(BuildContext context) async {
+    DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      // Default date is today
+      firstDate: DateTime.now().subtract(const Duration(days: 365)),
+      // 1 year in the past
+      lastDate:
+          DateTime.now().add(const Duration(days: 365)), // 1 year in the future
+    );
+    if (picked == null) {
+      return;
+    }
+    final pickedTime = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.fromDateTime(DateTime.now()),
+    );
+
+    if (pickedTime != null) {
+      picked =
+          picked.copyWith(hour: pickedTime.hour, minute: pickedTime.minute);
+      eventTime = picked;
+      setState(() {});
+    }
   }
 }

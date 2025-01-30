@@ -25,9 +25,3 @@ final class SummaryLoaded extends SummaryState {
   List<Object?> get props => [summary];
 }
 
-final class SummaryLoadedNoItem extends SummaryState {
-  const SummaryLoadedNoItem();
-
-  @override
-  List<Object?> get props => [];
-}

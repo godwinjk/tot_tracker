@@ -6,83 +6,87 @@ class BabyStatCard extends StatelessWidget {
   final dynamic subValue;
   final IconData icon;
   final Color color;
+  final VoidCallback callback;
 
   const BabyStatCard(
       {required this.title,
       required this.value,
       required this.icon,
       required this.color,
-      this.subValue});
+      this.subValue,
+      required this.callback});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withValues(alpha: 0.2),
-            blurRadius: 6,
-            spreadRadius: 2,
-            offset: const Offset(0, 4),
-          )
-        ],
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon, size: 30, color: Colors.white),
-          const SizedBox(height: 10),
-          Text(
-            title,
-            style: TextStyle(
-                fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black),
-          ),
-          const SizedBox(height: 5),
-          RichText(
-            maxLines: 3,
-            text: TextSpan(
-              style: DefaultTextStyle.of(context).style,
-              children: [
-                TextSpan(
-                  text: value.toString(),
-                  style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
-                      color: Colors.black),
-                ),
-                TextSpan(
-                  text: (title == "Weight" ? " kg" : " times"),
-                  style: DefaultTextStyle.of(context)
-                      .style
-                      .copyWith(color: Colors.black),
-                ),
-              ],
+    return GestureDetector(
+      onTap: callback,
+      child: Container(
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withValues(alpha: 0.2),
+              blurRadius: 6,
+              spreadRadius: 2,
+              offset: const Offset(0, 4),
+            )
+          ],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, size: 30, color: Colors.white),
+            const SizedBox(height: 10),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          ),
-          if (subValue != null)
+            const SizedBox(height: 5),
             RichText(
               maxLines: 3,
               text: TextSpan(
-                style: DefaultTextStyle.of(context)
-                    .style
-                    .copyWith(color: Colors.black),
+                style: DefaultTextStyle.of(context).style,
                 children: [
                   TextSpan(
-                    text: 'Consumed ',
+                    text: value.toString(),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                    ),
                   ),
                   TextSpan(
-                    text: '${value.toString()} mls',
-                    style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20,
-                        color: Colors.black),
+                    text: (title == "Weight" ? " kg" : " times"),
+                    style: DefaultTextStyle.of(context).style,
                   ),
                 ],
               ),
             ),
-        ],
+            if (subValue != null)
+              RichText(
+                maxLines: 3,
+                textAlign: TextAlign.center,
+                text: TextSpan(
+                  style: DefaultTextStyle.of(context).style,
+                  children: [
+                    TextSpan(
+                      text: 'Consumed ',
+                    ),
+                    TextSpan(
+                      text: '${subValue.toString()} mls',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }

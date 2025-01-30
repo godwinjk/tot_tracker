@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
@@ -7,7 +9,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tot_tracker/persistence/shared_pref_const.dart';
 import 'package:tot_tracker/res/asset_const.dart';
 import 'package:tot_tracker/router/route_path.dart';
-import 'dart:math' as math;
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -34,7 +35,7 @@ class _SplashScreenState extends State<SplashScreen> {
                 width: math.min(MediaQuery.sizeOf(context).height * 0.8,
                     MediaQuery.sizeOf(context).width * 0.8)),
             AnimatedTextKit(animatedTexts: [
-              TyperAnimatedText('Tot Tracker',
+              TyperAnimatedText('Baby Tracker',
                   speed: const Duration(milliseconds: 100),
                   textAlign: TextAlign.center,
                   textStyle: const TextStyle(

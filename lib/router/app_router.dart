@@ -9,6 +9,7 @@ import 'package:tot_tracker/presentantion/schedule/schedule_page.dart';
 import 'package:tot_tracker/presentantion/summary/summary_page.dart';
 import 'package:tot_tracker/router/route_path.dart';
 
+import '../presentantion/home/model/baby_event_type.dart';
 import '../presentantion/landing/main_screen.dart';
 import '../presentantion/relax/relax_info_screen.dart';
 import '../presentantion/splash/splash_screen.dart';
@@ -51,7 +52,20 @@ final router = GoRouter(
               routes: [
                 GoRoute(
                   path: RoutePath.detail,
-                  builder: (context, state) => const HomeDetailsPage(),
+                  builder: (context, state) {
+                    // Retrieve the query parameter and convert it to an enum
+                    final eventTypeStr = state.uri.queryParameters['type'];
+                    final eventType = eventTypeStr != null
+                        ? BabyEventType.values.firstWhere(
+                            (e) => e.toString() == eventTypeStr,
+                            orElse: () => BabyEventType.all, // Default value
+                          )
+                        : BabyEventType.all; // Default if missing
+
+                    return HomeDetailsPage(
+                      eventType: eventType,
+                    );
+                  },
                 )
               ]),
           GoRoute(

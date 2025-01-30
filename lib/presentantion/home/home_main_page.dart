@@ -6,9 +6,10 @@ import 'package:lottie/lottie.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tot_tracker/di/injection_base.dart';
 import 'package:tot_tracker/presentantion/home/baby_bloc/baby_event_cubit.dart';
-import 'package:tot_tracker/presentantion/home/model/selection_type.dart';
+import 'package:tot_tracker/presentantion/home/model/baby_event_type.dart';
 import 'package:tot_tracker/res/asset_const.dart';
 import 'package:tot_tracker/router/route_path.dart';
+import 'package:tot_tracker/theme/card_color_theme.dart';
 import 'package:tot_tracker/theme/color_palette.dart';
 
 import '../../persistence/shared_pref_const.dart';
@@ -26,7 +27,7 @@ class HomeMainPage extends StatefulWidget {
 class _HomeMainPageState extends State<HomeMainPage> {
   @override
   void initState() {
-    context.read<BabyEventCubit>().loadForDashboard(FilterType.last24);
+    context.read<BabyEventCubit>().load();
     super.initState();
   }
 
@@ -109,6 +110,8 @@ class _HomeMainPageState extends State<HomeMainPage> {
               child: BlocBuilder<BabyEventCubit, BabyEventState>(
                 builder: (context, state) {
                   if (state is BabyEventLoaded) {
+                    CardColorTheme colorTheme =
+                        Theme.of(context).extension<CardColorTheme>()!;
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -128,26 +131,42 @@ class _HomeMainPageState extends State<HomeMainPage> {
                                 title: 'Fed',
                                 value: state.model!.feed.length,
                                 icon: Icons.local_dining,
-                                color: Colors.pink.shade100,
+                                color: colorTheme.cardColors[0],
                                 subValue: state.model!.consumedMilk,
+                                callback: () {
+                                  getIt<GoRouter>().go(
+                                      '${RoutePath.homeDetails}?type=${BabyEventType.nursing}');
+                                },
                               ),
                               BabyStatCard(
                                 title: 'Pooped',
                                 value: state.model!.poop.length,
                                 icon: Icons.baby_changing_station,
-                                color: Colors.brown.shade100,
+                                color: colorTheme.cardColors[1],
+                                callback: () {
+                                  getIt<GoRouter>().go(
+                                      '${RoutePath.homeDetails}?type=${BabyEventType.poop}');
+                                },
                               ),
                               BabyStatCard(
                                 title: 'Wee',
                                 value: state.model!.wee.length,
                                 icon: Icons.water_drop,
-                                color: Colors.blue.shade100,
+                                color: colorTheme.cardColors[2],
+                                callback: () {
+                                  getIt<GoRouter>().go(
+                                      '${RoutePath.homeDetails}?type=${BabyEventType.wee}');
+                                },
                               ),
                               BabyStatCard(
                                 title: 'Weight',
                                 value: state.model!.babyWeight,
                                 icon: Icons.monitor_weight,
-                                color: Colors.orangeAccent.shade100,
+                                color: colorTheme.cardColors[3],
+                                callback: () {
+                                  getIt<GoRouter>().go(
+                                      '${RoutePath.homeDetails}?type=${BabyEventType.weight}');
+                                },
                               )
                             ]),
                         SizedBox(

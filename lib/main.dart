@@ -3,12 +3,12 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:flutter_native_timezone/flutter_native_timezone.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/data/latest.dart' as tzd;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:tot_tracker/di/injection_base.dart';
 import 'package:tot_tracker/presentantion/home/baby_bloc/baby_event_cubit.dart';
+import 'package:tot_tracker/presentantion/profile/bloc/profile_cubit.dart';
 import 'package:tot_tracker/presentantion/schedule/bloc/schedule_cubit.dart';
 import 'package:tot_tracker/presentantion/summary/bloc/summary_bloc_cubit.dart';
 import 'package:tot_tracker/presentantion/user/signin/bloc/auth_cubit.dart';
@@ -44,9 +44,13 @@ void onDidReceiveNotificationResponse(
 
 Future<void> initializeTimeZone() async {
   tzd.initializeTimeZones();
-  final String timeZoneName = await FlutterNativeTimezone
-      .getLocalTimezone(); // Get device's local time zone
-  tz.setLocalLocation(tz.getLocation(timeZoneName)); // Set local time zone
+  String timeZoneName = DateTime.now().timeZoneName;
+  try {
+    tz.setLocalLocation(tz.getLocation(timeZoneName));
+    print("Local Timezone Set: $timeZoneName");
+  } catch (e) {
+    print("Error setting timezone: $e");
+  }
 }
 
 void main() async {
@@ -97,10 +101,10 @@ class _MyAppState extends State<MyApp> {
           create: (_) => getIt<ThemeCubit>()..setGenderBasedTheme(context),
         ),
         BlocProvider(
-          create: (_) => getIt<BabyEventCubit>(),
+          create: (_) => getIt<BabyEventCubit>()..initial(),
         ),
         BlocProvider(
-          create: (_) => getIt<SummaryCubit>(),
+          create: (_) => getIt<SummaryCubit>()..initial(),
         ),
         BlocProvider(
           create: (_) => getIt<ScheduleCubit>(),
@@ -110,6 +114,9 @@ class _MyAppState extends State<MyApp> {
         ),
         BlocProvider(
           create: (_) => getIt<SignInUiCubit>(),
+        ),
+        BlocProvider(
+          create: (_) => getIt<ProfileCubit>(),
         ),
       ],
       child: BlocBuilder<ThemeCubit, ThemeLoaded>(
