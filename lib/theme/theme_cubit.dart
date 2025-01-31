@@ -30,14 +30,15 @@ class ThemeCubit extends Cubit<ThemeLoaded> {
         darkTheme: createTheme(currentPalette, isDarkMode: isDarkMode)));
   }
 
-  void setGenderBasedTheme(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+  void setGenderBasedTheme() {
     SharedPreferences.getInstance().then((value) {
       final gender = value.getString(SharedPrefConstants.gender) ?? '';
-      if (gender == "boy") {
+      if (gender == "Boy") {
         updateTheme(BoyColorPalette());
-      } else if (gender == "girl") {
+      } else if (gender == "Girl") {
         updateTheme(GirlColorPalette());
+      } else {
+        updateTheme(NeutralColorPalette());
       }
     });
   }

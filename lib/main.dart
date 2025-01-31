@@ -94,11 +94,10 @@ class _MyAppState extends State<MyApp> {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    getIt<ThemeCubit>().setGenderBasedTheme(context);
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (_) => getIt<ThemeCubit>()..setGenderBasedTheme(context),
+          create: (_) => getIt<ThemeCubit>()..setGenderBasedTheme(),
         ),
         BlocProvider(
           create: (_) => getIt<BabyEventCubit>()..initial(),

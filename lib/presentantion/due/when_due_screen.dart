@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:lottie/lottie.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tot_tracker/persistence/shared_pref_const.dart';
-import 'package:tot_tracker/res/asset_const.dart';
 import 'package:tot_tracker/router/route_path.dart';
 import 'package:tot_tracker/util/setup_steps.dart';
 
@@ -57,7 +55,7 @@ class _WhenAreDueScreenState extends State<WhenAreDueScreen> {
 
   // Function to open date picker
   Future<void> _selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
+    DateTime? picked = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
       // Default date is today
@@ -68,19 +66,29 @@ class _WhenAreDueScreenState extends State<WhenAreDueScreen> {
     );
 
     if (picked != null) {
-      SharedPreferences.getInstance().then((pref) {
-        pref.setInt(SharedPrefConstants.dueDate, picked.millisecondsSinceEpoch);
-        pref.setInt(SharedPrefConstants.setupSteps, SetupSteps.gender);
+      final pickedTime = await showTimePicker(
+        context: context,
+        initialTime: TimeOfDay.fromDateTime(DateTime.now()),
+      );
 
-        if (DateTime.now().millisecondsSinceEpoch <
-            picked.millisecondsSinceEpoch) {
-          pref.setInt(SharedPrefConstants.setupSteps, SetupSteps.due);
-          getIt<GoRouter>().go(RoutePath.waiting);
-        } else {
+      if (pickedTime != null) {
+        picked =
+            picked.copyWith(hour: pickedTime.hour, minute: pickedTime.minute);
+        SharedPreferences.getInstance().then((pref) {
+          pref.setInt(
+              SharedPrefConstants.dueDate, picked!.millisecondsSinceEpoch);
           pref.setInt(SharedPrefConstants.setupSteps, SetupSteps.gender);
-          getIt<GoRouter>().go(RoutePath.gender);
-        }
-      });
+
+          if (DateTime.now().millisecondsSinceEpoch <
+              picked.millisecondsSinceEpoch) {
+            pref.setInt(SharedPrefConstants.setupSteps, SetupSteps.due);
+            getIt<GoRouter>().go(RoutePath.waiting);
+          } else {
+            pref.setInt(SharedPrefConstants.setupSteps, SetupSteps.gender);
+            getIt<GoRouter>().go(RoutePath.gender);
+          }
+        });
+      }
     }
   }
 }

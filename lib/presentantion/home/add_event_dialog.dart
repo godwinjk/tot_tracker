@@ -239,6 +239,7 @@ class _AddEventDialogState extends State<AddEventDialog> {
                     labelText: 'Add weight (in KG)'),
               ),
             ],
+            SizedBox(height: 10),
             Wrap(
               children: [
                 Text('Event Time: '),

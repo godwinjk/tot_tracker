@@ -159,7 +159,15 @@ class _ProfilePageState extends State<ProfilePage> {
       lastDate: DateTime(2100),
     );
     if (pickedDate != null) {
-      context.read<ProfileCubit>().updateDueDate(pickedDate);
+      final pickedTime = await showTimePicker(
+        context: context,
+        initialTime: TimeOfDay.fromDateTime(DateTime.now()),
+      );
+      if (pickedTime != null) {
+        pickedDate = pickedDate.copyWith(
+            hour: pickedTime.hour, minute: pickedTime.minute);
+        context.read<ProfileCubit>().updateDueDate(pickedDate);
+      }
     }
   }
 
@@ -171,21 +179,21 @@ class _ProfilePageState extends State<ProfilePage> {
         ListTile(
           title: Text('Boy'),
           onTap: () {
-            context.read<ProfileCubit>().updateGender('boy');
+            context.read<ProfileCubit>().updateGender('Boy');
             Navigator.pop(context);
           },
         ),
         ListTile(
           title: Text('Girl'),
           onTap: () {
-            context.read<ProfileCubit>().updateGender('girl');
+            context.read<ProfileCubit>().updateGender('Girl');
             Navigator.pop(context);
           },
         ),
         ListTile(
           title: Text('Any'),
           onTap: () {
-            context.read<ProfileCubit>().updateGender('any');
+            context.read<ProfileCubit>().updateGender('Any');
             Navigator.pop(context);
           },
         )

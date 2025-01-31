@@ -116,6 +116,9 @@ class _HomeDetailsPageState extends State<HomeDetailsPage> {
       color: _getCardColor(context, event.type),
       margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
       child: ListTile(
+        onTap: () {
+          _showDeleteDialog(context, event);
+        },
         title: _getEventTitle(event),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -139,6 +142,9 @@ class _HomeDetailsPageState extends State<HomeDetailsPage> {
       color: _getCardColor(context, event.type),
       margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
       child: ListTile(
+        onTap: () {
+          _showDeleteDialog(context, event);
+        },
         title: _getEventTitle(event),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -169,6 +175,9 @@ class _HomeDetailsPageState extends State<HomeDetailsPage> {
       color: _getCardColor(context, event.type),
       margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
       child: ListTile(
+        onTap: () {
+          _showDeleteDialog(context, event);
+        },
         title: _getEventTitle(event),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -202,7 +211,12 @@ class _HomeDetailsPageState extends State<HomeDetailsPage> {
       color: _getCardColor(context, event.type),
       margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
       child: ListTile(
+        onTap: () {
+          _showDeleteDialog(context, event);
+        },
         title: _getEventTitle(event),
+        subtitle: Text(
+            'Weighed on ${formatDateTime(DateTime.fromMillisecondsSinceEpoch(event.eventTime))}'),
       ),
     );
   }
@@ -378,6 +392,16 @@ class _HomeDetailsPageState extends State<HomeDetailsPage> {
             },
             label: const Text('Wee'),
             selected: state.eventType == BabyEventType.wee),
+        ChoiceChip(
+            onSelected: (isSelected) {
+              if (isSelected) {
+                context
+                    .read<BabyEventCubit>()
+                    .filter(eventType: BabyEventType.weight);
+              }
+            },
+            label: const Text('Weight'),
+            selected: state.eventType == BabyEventType.weight),
       ],
     );
   }
@@ -403,5 +427,30 @@ class _HomeDetailsPageState extends State<HomeDetailsPage> {
       context: context,
       builder: (context) => AddEventDialog(),
     );
+  }
+
+  void _showDeleteDialog(BuildContext context, BabyEvent event) {
+    showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+              title: Text('Do you want to delete the event?'),
+              content: Text(
+                  'This action cannot be undone. Anyway you can add a new event with the event time by clicking add button.'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context), // Close dialog
+                  child: Text("Cancel"),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context); // Close dialog
+                    context
+                        .read<BabyEventCubit>()
+                        .deleteEvent(event); // Execute delete action
+                  },
+                  child: Text("Confirm"),
+                ),
+              ],
+            ));
   }
 }

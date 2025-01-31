@@ -75,7 +75,7 @@ class GirlColorPalette extends ColorPalette {
   @override
   Color get accent => const Color(0xFFFFCDD2); // Light Coral
   @override
-  Color get appBarBackground => const Color(0xFFD81B60); // Deep Pink
+  Color get appBarBackground => const Color(0xFF8F782A); // Deep Pink
   @override
   Color get bottomNavBackground => const Color(0xFFFFF8E1); // Light Cream
   @override
@@ -90,7 +90,7 @@ class GirlColorPalette extends ColorPalette {
   @override
   Color get darkAccent => const Color(0xFFFFAB91); // Muted Coral
   @override
-  Color get darkAppBarBackground => const Color(0xFF880E4F); // Deep Dark Pink
+  Color get darkAppBarBackground => const Color(0xFF884F0E); // Deep Dark Pink
   @override
   Color get darkBottomNavBackground => const Color(0xFF424242); // Dark Gray
   @override

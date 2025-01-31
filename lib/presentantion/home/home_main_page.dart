@@ -247,11 +247,10 @@ class _HomeMainPageState extends State<HomeMainPage> {
                   ),
                   titlesData: FlTitlesData(
                     leftTitles: AxisTitles(
-                        axisNameWidget: Text('Weight'), axisNameSize: 40),
-                    rightTitles: AxisTitles(
+                      axisNameWidget: Text('Weight(kg)'),
+                      axisNameSize: 40,
                       sideTitles: SideTitles(
                         showTitles: true,
-                        reservedSize: 40,
                         interval: 2,
                         getTitlesWidget: (value, meta) => Text(
                           value.toInt().toString(),

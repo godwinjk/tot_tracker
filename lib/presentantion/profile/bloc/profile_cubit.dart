@@ -5,6 +5,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tot_tracker/persistence/shared_pref_const.dart';
 import 'package:tot_tracker/router/route_path.dart';
+import 'package:tot_tracker/theme/theme_cubit.dart';
 
 import '../../../di/injection_base.dart';
 
@@ -44,17 +45,25 @@ class ProfileCubit extends Cubit<ProfileState> {
   }
 
   void updateBabyName(String newName) async {
-    emit(state.copyWith(babyName: newName));
+    SharedPreferences.getInstance().then((pref) {
+      pref.setString(SharedPrefConstants.babyName, newName);
+      emit(state.copyWith(babyName: newName));
+    });
   }
 
   void updateDueDate(DateTime newDate) async {
-    _loadDueDate(newDate.millisecondsSinceEpoch);
-    emit(state.copyWith(dueDate: dueDate));
+    SharedPreferences.getInstance().then((pref) {
+      pref.setInt(SharedPrefConstants.dueDate, newDate.millisecondsSinceEpoch);
+      _loadDueDate(newDate.millisecondsSinceEpoch);
+      emit(state.copyWith(dueDate: dueDate));
+    });
   }
 
   void updateGender(String newGender) async {
     final pref = await SharedPreferences.getInstance();
     pref.setString(SharedPrefConstants.gender, newGender);
+    gender = newGender;
+    getIt<ThemeCubit>().setGenderBasedTheme();
     emit(state.copyWith(gender: newGender));
   }
 

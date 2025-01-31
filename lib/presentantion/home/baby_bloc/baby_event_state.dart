@@ -22,9 +22,9 @@ final class BabyEventLoaded extends BabyEventState {
   final BabyEventType eventType;
   final DashboardModel? model;
 
-  const BabyEventLoaded(
-      this.events, this.filterType, this.eventType, this.weightData, this.model);
+  const BabyEventLoaded(this.events, this.filterType, this.eventType,
+      this.weightData, this.model);
 
   @override
-  List<Object> get props => [events];
+  List<Object?> get props => [events, weightData, filterType, eventType, model];
 }

@@ -33,10 +33,12 @@ class BabyEventCubit extends Cubit<BabyEventState> {
   FilterType filterType = FilterType.week;
   BabyEventType filterEventType = BabyEventType.all;
   late int babyBornEpoch;
+  late String userId;
 
   void initial() {
     _db = FirebaseFirestore.instance;
     _firebaseAuth = FirebaseAuth.instance;
+    userId = _firebaseAuth.currentUser!.uid;
   }
 
   void load({
@@ -52,7 +54,6 @@ class BabyEventCubit extends Cubit<BabyEventState> {
       events = BabyEventTestData.getTestData();
     } else {
       events = await _databaseHelper.getBabyEvents();
-      final userId = _firebaseAuth.currentUser!.uid;
       events = await getBabyEvents(userId);
     }
     filter(type: filterType, eventType: filterEventType);
@@ -122,7 +123,7 @@ class BabyEventCubit extends Cubit<BabyEventState> {
     } catch (e) {
       debugPrint(e.toString());
     }
-    // load();
+    load();
   }
 
   void filter({FilterType? type, BabyEventType? eventType}) {
@@ -189,5 +190,15 @@ class BabyEventCubit extends Cubit<BabyEventState> {
 
   int getWeeksSinceBirth(int epochTime, int birthEpoch) {
     return ((epochTime - birthEpoch) / (7 * 24 * 60 * 60 * 1000)).floor();
+  }
+
+  void deleteEvent(BabyEvent event) {
+    _db
+        .collection('Events')
+        .doc(userId)
+        .collection('baby_events')
+        .doc(event.eventTime.toString())
+        .delete();
+    load();
   }
 }
