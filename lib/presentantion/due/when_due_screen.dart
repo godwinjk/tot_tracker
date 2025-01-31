@@ -65,12 +65,15 @@ class _WhenAreDueScreenState extends State<WhenAreDueScreen> {
           DateTime.now().add(const Duration(days: 365)), // 1 year in the future
     );
 
+    TimeOfDay? pickedTime = TimeOfDay.fromDateTime(DateTime.now());
     if (picked != null) {
-      final pickedTime = await showTimePicker(
-        context: context,
-        initialTime: TimeOfDay.fromDateTime(DateTime.now()),
-      );
-
+      if (DateTime.now().millisecondsSinceEpoch >
+          picked.millisecondsSinceEpoch) {
+        pickedTime = await showTimePicker(
+          context: context,
+          initialTime: TimeOfDay.fromDateTime(DateTime.now()),
+        );
+      }
       if (pickedTime != null) {
         picked =
             picked.copyWith(hour: pickedTime.hour, minute: pickedTime.minute);
